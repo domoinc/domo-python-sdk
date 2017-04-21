@@ -1,4 +1,4 @@
-#domo-python-sdk (pydomo)
+# domo-python-sdk (pydomo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
 
 ### About
