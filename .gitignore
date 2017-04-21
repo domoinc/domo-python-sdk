@@ -1,0 +1,9 @@
+*.iml
+*.ipr
+*.iws
+math.csv
+pydomo/__pycache__
+pydomo/datasets/__pycache__
+pydomo/groups/__pycache__
+pydomo/streams/__pycache__
+pydomo/users/__pycache__
