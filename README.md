@@ -5,6 +5,7 @@
 
 The official Domo Python3 SDK (pydomo)
 * This has not yet been tested with Python2
+* This python package will soon be published to PyPI; for now, please clone and import pydomo
 
 ### Features:
 * DataSet Management: https://developer.domo.com/docs/domo-apis/data
