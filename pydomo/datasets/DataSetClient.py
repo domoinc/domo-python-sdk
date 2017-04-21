@@ -60,7 +60,7 @@ class DataSetClient(DomoAPIClient):
     """
     def data_import_from_file(self, dataset_id, filepath):
         with open(filepath, 'r') as csvfile:
-            # passing a file as 'data' the requests lib invokes http streaming (uses minimal system memory)
+            # passing an open file to the requests library invokes http streaming (uses minimal system memory)
             self.data_import(dataset_id, csvfile)
 
     """
