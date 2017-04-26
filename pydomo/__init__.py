@@ -1,10 +1,9 @@
-from pydomo.datasets.DataSetClient import DataSetClient
-from pydomo.streams.StreamClient import StreamClient
-from pydomo.groups.GroupClient import GroupClient
-from pydomo.users.UserClient import UserClient
 from pydomo.Transport import DomoAPITransport
+from pydomo.datasets import DataSetClient
+from pydomo.groups import GroupClient
+from pydomo.streams import StreamClient
+from pydomo.users import UserClient
 import logging
-
 
 DOMO = """####################################################################################################
 ####################################################################################################
@@ -89,4 +88,3 @@ class Domo:
 
     def get_logger(self):
         return self.logger
-

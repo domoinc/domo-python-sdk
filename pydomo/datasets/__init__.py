@@ -1,3 +1,3 @@
-from pydomo.datasets.DataSetModel import Column, ColumnType, DataSetRequest, DataSet, DataSetAndPDP, DataSetListResult
-from pydomo.datasets.DataSetModel import FilterOperator, Owner, Policy, PolicyType, PolicyFilter, Schema
-from pydomo.datasets.DataSetClient import DataSetClient
+from .DataSetModel import Column, ColumnType, DataSetRequest, DataSet, DataSetAndPDP, DataSetListResult
+from .DataSetModel import FilterOperator, Owner, Policy, PolicyType, PolicyFilter, Schema
+from .DataSetClient import DataSetClient

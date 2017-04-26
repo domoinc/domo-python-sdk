@@ -3,9 +3,9 @@
 
 ### About
 
-The official Domo Python3 SDK (pydomo)
+The official Domo Python3 SDK (PyDomo)
 * This has not yet been tested with Python2
-* This python package will soon be published to PyPI; for now, please clone and import pydomo
+* PyDomo has been published to PyPI, and can be installed via `pip3 install pydomo requests jsonpickle`
 
 ### Features:
 * DataSet Management: https://developer.domo.com/docs/domo-apis/data
@@ -18,7 +18,7 @@ The official Domo Python3 SDK (pydomo)
     * Linux: 'apt-get install python3'
     * MacOS: 'brew install python3'
     * Windows: direct download, or use Bash on Windows 10
-* Clone the repo and run setup.sh, or execute "pip3 install requests jsonpickle"
+* Install PyDomo and its dependencies via `pip3 install pydomo requests jsonpickle`
 
 ### Usage
 * See 'examples.py' for full usage

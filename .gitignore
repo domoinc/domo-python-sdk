@@ -7,3 +7,7 @@ pydomo/datasets/__pycache__
 pydomo/groups/__pycache__
 pydomo/streams/__pycache__
 pydomo/users/__pycache__
+publishPypiLive.sh
+publishPypiTest.sh
+MANIFEST
+dist
