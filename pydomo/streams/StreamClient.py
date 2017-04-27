@@ -93,7 +93,7 @@ class StreamClient(DomoAPIClient):
         return self._list(url, params, self.executionDesc)
 
     """
-        Upload a data part ()
+        Upload a data part
         - Data sources should be broken into parts and uploaded in parallel
         - Parts should be a minimum of 25mb
     """
