@@ -1,9 +1,14 @@
-# domo-python-sdk (pydomo)
+<div align="center">
+  <img src="domo.png" width="400" height="400"/>
+</div>
+
+# Python3 - Domo API SDK (pydomo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
+
+Current Release: 0.1.2
 
 ### About
 
-The official Domo Python3 SDK (PyDomo)
 * The Domo API SDK is the simplest way to automate your Domo instance
 * The SDK streamlines the API programming experience, allowing you to significantly reduce your written code
 * This has not yet been tested with Python2
@@ -34,8 +39,12 @@ The official Domo Python3 SDK (PyDomo)
     * Windows: direct download, or use Bash on Windows 10
 * Install PyDomo and its dependencies via `pip3 install pydomo requests jsonpickle`
 
+### Updates
+* Update your PyDomo package via `pip3 install pydomo --upgrade`
+* View the [changelog](CHANGELOG.md)
+
 ### Usage
-* See 'examples.py' for full usage
+* See [examples.py](examples.py) for full usage
 * Create an API Client on the [Domo Developer Portal](https://developer.domo.com/)
 * Use your API Client id/secret to instantiate pydomo 'Domo()'
 * Multiple API Clients can be used by instantiating multiple 'Domo()' clients
@@ -44,11 +53,17 @@ The official Domo Python3 SDK (PyDomo)
 ```python
 import logging
 from pydomo import Domo
+
+# Build an SDK configuration
 client_id = 'MY_CLIENT_ID'
 client_secret = 'MY_CLIENT_SECRET'
+api_host = 'api.domo.com'
+use_https = True
 logger_name = 'foo'
 logger_level = logging.INFO
-domo = Domo(client_id, client_secret, logger_name, logger_level)
+
+# Create an instance of the SDK Client
+domo = Domo(client_id, client_secret, api_host, use_https, logger_name, logger_level)
 
 # Manage DataSets
 domo.datasets.create()

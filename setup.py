@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='pydomo',
-    version='0.1.1',
+    version='0.1.2',
     description='The official python3 Domo API SDK - Domo, Inc.',
     author='Bobby Swingler',
     author_email='bobby.swingler@domo.com',
