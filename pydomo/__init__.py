@@ -59,10 +59,10 @@ DOMO = """######################################################################
 
 
 class Domo:
-    def __init__(self, client_id, client_secret, logger_name, logger_level):
+    def __init__(self, client_id, client_secret, api_host, use_https, logger_name, logger_level):
         self.logger = self._init_logger(logger_name, logger_level)
         self.logger.info("\n" + DOMO + "\n")
-        self.transport = DomoAPITransport(client_id, client_secret, self.logger)
+        self.transport = DomoAPITransport(client_id, client_secret, api_host, use_https, self.logger)
         self.streams = StreamClient(self.transport, self.logger)
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)

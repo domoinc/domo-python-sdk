@@ -14,12 +14,20 @@ import json
 
 
 class DomoAPITransport:
-    def __init__(self, client_id, client_secret, logger):
-        self.apiHost = 'https://api.domo.com'
+    def __init__(self, client_id, client_secret, api_host, use_https, logger):
+        self.apiHost = self._build_apihost(api_host, use_https)
         self.clientId = client_id
         self.clientSecret = client_secret
         self.access_token = ''
         self.logger = logger
+
+    @staticmethod
+    def _build_apihost(host, use_https):
+        if use_https:
+            host = 'https://' + host
+        else:
+            host = 'http://' + host
+        return host
 
     def get(self, url, params):
         return self.request(url, HTTPMethod.GET, self._headers_receive_json(), params, {})

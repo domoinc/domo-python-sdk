@@ -22,9 +22,11 @@ class DomoSDKExamples:
         # If you have multiple API clients you would like to use, simply initialize multiple Domo() instances
         client_id = 'MY_CLIENT_ID'
         client_secret = 'MY_CLIENT_SECRET'
-        logger_name = 'fooClient_1'
+        api_host = 'api.domo.com'
+        use_https = True
+        logger_name = 'foo'
         logger_level = logging.INFO
-        self.domo = Domo(client_id, client_secret, logger_name, logger_level)
+        self.domo = Domo(client_id, client_secret, api_host, use_https, logger_name, logger_level)
         self.logger = self.domo.logger
 
     # DataSets are useful for data sources that only require occasional replacement
@@ -233,7 +235,7 @@ class DomoSDKExamples:
         user_update = CreateUserRequest()
         user_update.name = 'Leo Euler'
         user_update.email = 'leo.euler' + str(randint(0, 10000)) + '@domo.com'
-        user_update.role = 'Admin'
+        user_update.role = 'Privileged'
         user = users.update(user.id, user_update)
         self.logger.info("Updated User '" + user.name + "' : " + user.email)
 
@@ -254,15 +256,15 @@ class DomoSDKExamples:
 
         # Create a Group
         group = groups.create(group_request)
-        self.logger.info("Created group '" + group.name + "'")
+        self.logger.info("Created Group '" + group.name + "'")
     
         # Get a Group
         group = groups.get(group.id)
-        self.logger.info("Retrieved group '" + group.name + "'")
+        self.logger.info("Retrieved Group '" + group.name + "'")
 
         # List Groups
         group_list = groups.get(group.id)
-        self.logger.info("Retrieved a list containing " + str(len(group_list)) + " group(s)")
+        self.logger.info("Retrieved a list containing " + str(len(group_list)) + " Group(s)")
 
         # Update a Group
         group_update = CreateGroupRequest()
@@ -270,7 +272,21 @@ class DomoSDKExamples:
         group_update.active = False
         group_update.default = False
         group = groups.update(group.id, group_update)
-        self.logger.info("Updated group '" + group.name + "'")
+        self.logger.info("Updated Group '" + group.name + "'")
+
+        # Add a User to a Group
+        user_list = self.domo.users.list(10, 0)  # Retrieve the first listed user
+        user = user_list[0]
+        groups.add_user(group.id, user.id)
+        self.logger.info("Added User " + str(user.id) + " to Group " + str(group.id))
+
+        # List Users in a Group
+        user_list = groups.list_users(group.id)
+        self.logger.info("Retrieved a User list from a Group containing " + str(len(user_list)) + " User(s)")
+
+        # Remove a User from a Group
+        groups.remove_user(group.id, user.id)
+        self.logger.info("Removed User " + str(user.id) + " from Group " + str(group.id))
 
         # Delete a Group
         groups.delete(group.id)

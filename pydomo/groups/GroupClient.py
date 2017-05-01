@@ -47,5 +47,29 @@ class GroupClient(DomoAPIClient):
     """
         Delete a Group
     """
-    def delete(self, Group_id):
-        return self._delete(self._base(Group_id), self.groupDesc)
+    def delete(self, group_id):
+        return self._delete(self._base(group_id), self.groupDesc)
+
+    """
+        Add a User to a Group
+    """
+    def add_user(self, group_id, user_id):
+        url = self._base(group_id) + '/users/' + str(user_id)
+        desc = "a User in a Group"
+        return self._update(url, HTTPMethod.PUT, requests.codes.no_content, {}, desc)
+
+    """
+        List Users in a Group
+    """
+    def list_users(self, group_id):
+        url = self._base(group_id) + '/users'
+        desc = "a list of Users in a Group"
+        return self._get(url, desc)
+
+    """
+        Remove a User to a Group
+    """
+    def remove_user(self, group_id, user_id):
+        url = self._base(group_id) + '/users/' + str(user_id)
+        desc = "a User in a Group"
+        return self._delete(url, desc)
