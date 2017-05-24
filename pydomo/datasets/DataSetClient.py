@@ -33,11 +33,12 @@ class DataSetClient(DomoAPIClient):
 
     """
         List DataSets
-        Returns a generator that will call the API multiple times to return up to limit datasets
+        Returns a generator that will call the API multiple times
+        If limit is supplied and non-zero, returns up to limit datasets
     """
     def list(self, sort=Sorting.DEFAULT, per_page=50, offset=0, limit=0):
         # API uses pagination with a max of 50 per page
-        if per_page not in range(1,51):
+        if per_page not in range(1, 51):
             raise ValueError('per_page must be between 1 and 50 (inclusive)')
 
         # Don't pull 50 values if user requests 10
