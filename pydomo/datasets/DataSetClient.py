@@ -1,3 +1,4 @@
+from pydomo.datasets import Sorting
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.Transport import HTTPMethod
 import requests
@@ -32,15 +33,37 @@ class DataSetClient(DomoAPIClient):
 
     """
         List DataSets
-        - The 'limit' max is 50; use offset pagination to retrieve more DataSets
+        Returns a generator that will call the API multiple times to return up to limit datasets
     """
-    def list(self, sort, limit, offset):
+    def list(self, sort=Sorting.DEFAULT, per_page=50, offset=0, limit=0):
+        # API uses pagination with a max of 50 per page
+        if per_page not in range(1,51):
+            raise ValueError('per_page must be between 1 and 50 (inclusive)')
+
+        # Don't pull 50 values if user requests 10
+        if limit:
+            per_page = min(per_page, limit)
+
         params = {
-            'sort': str(sort),
-            'limit': str(limit),
-            'offset': str(offset),
+            'sort': sort,
+            'limit': per_page,
+            'offset': offset,
         }
-        return self._list(self.urlBase, params, self.dataSetDesc)
+        dataset_count = 0
+
+        datasets = self._list(self.urlBase, params, self.dataSetDesc)
+        while datasets:
+            for dataset in datasets:
+                yield dataset
+                dataset_count += 1
+                if limit and dataset_count >= limit:
+                    return
+
+            params['offset'] += per_page
+            if limit and params['offset'] + per_page > limit:
+                # Don't need to pull more than the limit
+                params['limit'] = limit - params['offset']
+            datasets = self._list(self.urlBase, params, self.dataSetDesc)
 
     """
         Update a DataSet
