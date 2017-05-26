@@ -99,3 +99,11 @@ class PolicyFilter:
 class Schema:
     def __init__(self, columns):
         self.columns = columns
+
+
+class Sorting:
+    CARD_COUNT = 'cardCount'
+    DEFAULT = None
+    NAME = 'name'
+    STATUS = 'errorState'
+    UPDATED = 'lastUpdated'

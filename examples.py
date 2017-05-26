@@ -1,5 +1,6 @@
 from pydomo import Domo
-from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy, PolicyFilter, FilterOperator, PolicyType
+from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
+from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
 from pydomo.groups import CreateGroupRequest
 from pydomo.streams import UpdateMethod, CreateStreamRequest
 from pydomo.users import CreateUserRequest
@@ -50,10 +51,7 @@ class DomoSDKExamples:
         self.logger.info("Retrieved DataSet " + str(retrieved_dataset.id))
 
         # List DataSets
-        sort_by = 'name'
-        limit = 50  # The API max limit is 50; use offset pagination to retrieve more DataSets
-        offset = 0
-        dataset_list = datasets.list(sort_by, limit, offset)
+        dataset_list = list(datasets.list(sort=Sorting.NAME))
         self.logger.info("Retrieved a list containing " + str(len(dataset_list)) + " DataSet(s)")
 
         # Update a DataSets's metadata
