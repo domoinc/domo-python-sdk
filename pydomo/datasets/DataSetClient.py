@@ -1,6 +1,7 @@
-from pydomo.datasets import Sorting
+from pydomo.datasets import Sorting, UpdateMethod
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.Transport import HTTPMethod
+import os
 import requests
 
 """
@@ -15,7 +16,7 @@ import requests
 class DataSetClient(DomoAPIClient):
     def __init__(self, transport, logger):
         super(DataSetClient, self).__init__(transport, logger)
-        self.urlBase = '/v1/datasets/'
+        self.url_base = '/v1/datasets'
         self.dataSetDesc = "DataSet"
         self.PDPDesc = "Personalized Data Policy (PDP)"
 
@@ -23,13 +24,14 @@ class DataSetClient(DomoAPIClient):
         Create a DataSet
     """
     def create(self, dataset_request):
-        return self._create(self.urlBase, dataset_request, {}, self.dataSetDesc)
+        return self._create(self.url_base, dataset_request, {}, self.dataSetDesc)
 
     """
         Get a DataSet
     """
     def get(self, dataset_id):
-        return self._get(self._base(dataset_id), self.dataSetDesc)
+        url = '{base}/{dataset_id}'.format(base=self.url_base, dataset_id=dataset_id)
+        return self._get(url, self.dataSetDesc)
 
     """
         List DataSets
@@ -52,7 +54,7 @@ class DataSetClient(DomoAPIClient):
         }
         dataset_count = 0
 
-        datasets = self._list(self.urlBase, params, self.dataSetDesc)
+        datasets = self._list(self.url_base, params, self.dataSetDesc)
         while datasets:
             for dataset in datasets:
                 yield dataset
@@ -64,34 +66,36 @@ class DataSetClient(DomoAPIClient):
             if limit and params['offset'] + per_page > limit:
                 # Don't need to pull more than the limit
                 params['limit'] = limit - params['offset']
-            datasets = self._list(self.urlBase, params, self.dataSetDesc)
+            datasets = self._list(self.url_base, params, self.dataSetDesc)
 
     """
         Update a DataSet
     """
     def update(self, dataset_id, dataset_update):
-        return self._update(self._base(dataset_id), HTTPMethod.PUT, requests.codes.ok, dataset_update, self.dataSetDesc)
+        url = '{base}/{dataset_id}'.format(base=self.url_base, dataset_id=dataset_id)
+        return self._update(url, HTTPMethod.PUT, requests.codes.ok, dataset_update, self.dataSetDesc)
 
     """
         Import data from a CSV string
     """
-    def data_import(self, dataset_id, csv):
-        url = self._base(dataset_id) + '/data'
+    def data_import(self, dataset_id, csv, update_method=UpdateMethod.REPLACE):
+        url = '{base}/{dataset_id}/data?updateMethod={method}'.format(
+                base=self.url_base, dataset_id=dataset_id, method=update_method)
         return self._upload_csv(url, requests.codes.no_content, csv, self.dataSetDesc)
 
     """
         Import data from a CSV file
     """
-    def data_import_from_file(self, dataset_id, filepath):
-        with open(filepath, 'rb') as csvfile:
+    def data_import_from_file(self, dataset_id, filepath, update_method=UpdateMethod.REPLACE):
+        with open(os.path.expanduser(filepath), 'rb') as csvfile:
             # passing an open file to the requests library invokes http streaming (uses minimal system memory)
-            self.data_import(dataset_id, csvfile)
+            self.data_import(dataset_id, csvfile, update_method)
 
     """
         Export data to a CSV string
     """
     def data_export(self, dataset_id, include_csv_header):
-        url = self._base(dataset_id) + '/data'
+        url = '{base}/{dataset_id}/data'.format(base=self.url_base, dataset_id=dataset_id)
         params = {
             'includeHeader': str(include_csv_header),
             'fileName': 'foo.csv'
@@ -118,38 +122,43 @@ class DataSetClient(DomoAPIClient):
         Delete a DataSet
     """
     def delete(self, dataset_id):
-        return self._delete(self._base(dataset_id), self.dataSetDesc)
+        url = '{base}/{dataset_id}'.format(base=self.url_base, dataset_id=dataset_id)
+        return self._delete(url, self.dataSetDesc)
 
     """
         Create a Personalized Data Policy (PDP)
     """
     def create_pdp(self, dataset_id, pdp_request):
-        url = self._base(dataset_id) + '/policies'
+        url = '{base}/{dataset_id}/policies'.format(base=self.url_base, dataset_id=dataset_id)
         return self._create(url, pdp_request, {}, self.PDPDesc)
 
     """
         Get a specific Personalized Data Policy (PDP) for a given DataSet
     """
     def get_pdp(self, dataset_id, policy_id):
-        return self._get(self._base(dataset_id), self.PDPDesc)
+        url = '{base}/{dataset_id}/policies/{policy_id}'.format(
+                base=self.url_base, dataset_id=dataset_id, policy_id=policy_id)
+        return self._get(url, self.PDPDesc)
 
     """
         List all Personalized Data Policies (PDPs) for a given DataSet
     """
     def list_pdps(self, dataset_id):
-        url = self._base(dataset_id) + '/policies'
+        url = '{base}/{dataset_id}/policies'.format(base=self.url_base, dataset_id=dataset_id)
         return self._list(url, {}, self.dataSetDesc)
 
     """
         Update a specific Personalized Data Policy (PDP) for a given DataSet
     """
     def update_pdp(self, dataset_id, policy_id, policy_update):
-        url = self._base(dataset_id) + '/policies/' + str(policy_id)
+        url = '{base}/{dataset_id}/policies/{policy_id}'.format(
+                base=self.url_base, dataset_id=dataset_id, policy_id=policy_id)
         return self._update(url, HTTPMethod.PUT, requests.codes.ok, policy_update, self.PDPDesc)
 
     """
         Delete a specific Personalized Data Policy (PDPs) for a given DataSet
     """
     def delete_pdp(self, dataset_id, policy_id):
-        url = self._base(dataset_id) + '/policies/' + str(policy_id)
+        url = '{base}/{dataset_id}/policies/{policy_id}'.format(
+                base=self.url_base, dataset_id=dataset_id, policy_id=policy_id)
         return self._delete(url, self.PDPDesc)
