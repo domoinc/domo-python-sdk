@@ -1,7 +1,7 @@
-from pydomo.DomoAPIClient import DomoAPIClient
-from pydomo.streams import UpdateMethod
-from pydomo.Transport import HTTPMethod
 import requests
+
+from pydomo.DomoAPIClient import DomoAPIClient
+from pydomo.Transport import HTTPMethod
 
 """
     Streams
@@ -76,7 +76,8 @@ class StreamClient(DomoAPIClient):
     """
     def create_execution(self, stream_id, update_method=None):
         url = self._base(stream_id) + '/executions'
-        return self._create(url, {'updateMethod':update_method}, {}, self.executionDesc)
+        body = {'updateMethod': update_method}
+        return self._create(url, body, {}, self.executionDesc)
 
     """
         Get a Stream Execution
