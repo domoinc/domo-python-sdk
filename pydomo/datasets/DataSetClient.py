@@ -164,7 +164,8 @@ class DataSetClient(DomoAPIClient):
     def update_pdp(self, dataset_id, policy_id, policy_update):
         url = '{base}/{dataset_id}/policies/{policy_id}'.format(
                 base=URL_BASE, dataset_id=dataset_id, policy_id=policy_id)
-        return self._update(url, HTTPMethod.PUT, requests.codes.ok, policy_update, PDP_DESC)
+        return self._update(url, HTTPMethod.PUT, requests.codes.ok,
+                            policy_update, PDP_DESC)
 
     """
         Delete a specific Personalized Data Policy (PDPs) for a given DataSet
