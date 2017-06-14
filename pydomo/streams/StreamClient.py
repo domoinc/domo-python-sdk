@@ -61,7 +61,7 @@ class StreamClient(DomoAPIClient):
             'q': str(stream_property),
             'fields': 'all'
         }
-        return self._list(self.urlBase, params, self.streamDesc)
+        return self._list(self.urlBase + 'search', params, self.streamDesc)
 
     """
         Create a Stream Execution (begin a multi-part upload process for a single Domo DataSet)
