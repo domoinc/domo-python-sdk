@@ -20,16 +20,54 @@ class DomoSDKExamples:
         # Create an API client on https://developer.domo.com
         # Initialize the Domo SDK with your API client id/secret
         # If you have multiple API clients you would like to use, simply initialize multiple Domo() instances
-        client_id = 'MY_CLIENT_ID'
-        client_secret = 'MY_CLIENT_SECRET'
-        api_host = 'api.domo.com'
-        use_https = True
-        logger_name = 'foo'
+        client_id = '1a7b64c9-5d3a-4800-9da4-ba9efb90ec0c'
+        client_secret = '1a7b64c9-5d3a-4800-9da4-ba9efb90ec0c'
+        api_host = 'http://big-fox.domorig.io'
+        use_https = False
+        logger_name = ''
         logger_level = logging.INFO
         self.domo = Domo(client_id, client_secret, api_host, use_https, logger_name, logger_level)
         self.logger = self.domo.logger
 
-    # DataSets are useful for data sources that only require occasional replacement
+    def users_authorities(self):
+        # User Docs: https://developer.domo.com/docs/domo-apis/users
+        self.logger.info("\n**** Domo API - User Examples ****\n")
+        users = self.domo.users
+
+        # Build a custom role User
+        user_request = CreateUserRequest()
+        user_request.name = 'Leonhard Euler'
+        user_request.email = 'leonhard.euler' + str(randint(0, 10000)) + '@domo.com'
+        user_request.roleId = 6
+        send_invite = False
+
+        # Create the custom role User
+        user = users.create(user_request, send_invite)
+        self.logger.info("Created User '" + user.name + "'")
+
+        # user_list = users.list(50,0)
+        # self.logger.info("User List: " + str(user_list))
+
+    def roles(self):
+        roles = self.domo.roles
+
+        # Create
+
+
+        # # Get
+        # role_id = 6
+        # role = roles.get(role_id)
+        # self.logger.info("Retrieved Role " + str(role.name))
+
+        # List
+        role_list = roles.list()
+        self.logger.info("Retrieved a list containing " + str(len(role_list)) + " Roles(s)")
+        #self.logger.info("Roles: " + str(role_list))
+
+
+
+
+    #DataSets are useful for data sources that only require occasional replacement
     def datasets(self):
         # DataSet Docs: https://developer.domo.com/docs/data-apis/data
         self.logger.info("\n**** Domo API - DataSet Examples ****\n")
@@ -60,12 +98,13 @@ class DomoSDKExamples:
         update = DataSetRequest()
         update.name = 'Leonhard Euler Party - Update'
         update.description = 'Mathematician Guest List - Update'
-        update.schema = Schema([Column(ColumnType.STRING, 'Friend'), Column(ColumnType.STRING, 'Attending')])
+        update.schema = Schema([Column(ColumnType.STRING, 'Friend'), Column(ColumnType.STRING, 'Attending'), Column(ColumnType.DATE, 'RSVP')])
+
         updated_dataset = datasets.update(dataset.id, update)
         self.logger.info("Updated DataSet " + str(updated_dataset.id) + " : " + updated_dataset.name)
 
         # Import Data from a string
-        csv_upload = "\"Pythagoras\",\"FALSE\"\n\"Alan Turing\",\"TRUE\"\n\"George Boole\",\"TRUE\""
+        csv_upload = "\"Pythagoras\",\"FALSE\",\"2016-06-21\"\n\"Alan Turing\",\"TRUE\",\"2016-06-21\"\n\"George Boole\",\"TRUE\",\"2016-06-21\""
         datasets.data_import(dataset.id, csv_upload)
         self.logger.info("Uploaded data to DataSet " + str(dataset.id))
 
@@ -243,11 +282,33 @@ class DomoSDKExamples:
         users.delete(user.id)
         self.logger.info("Deleted User '" + user.name + "'")
 
+
+
+        # Get a User
+        user = users.get(user.id)
+        self.logger.info("Retrieved User '" + user.name + "'")
+
+        # List Users
+        user_list = users.get(user.id)
+        self.logger.info("Retrieved a list containing " + str(len(user_list)) + " User(s)")
+
+        # Update a User
+        user_update = CreateUserRequest()
+        user_update.name = 'Leo Euler'
+        user_update.email = 'leo.euler' + str(randint(0, 10000)) + '@domo.com'
+        user_update.role = 'Privileged'
+        user = users.update(user.id, user_update)
+        self.logger.info("Updated User '" + user.name + "' : " + user.email)
+
+        # Delete a User
+        users.delete(user.id)
+        self.logger.info("Deleted User '" + user.name + "'")
+
     def groups(self):
         # Group Docs: https://developer.domo.com/docs/domo-apis/group-apis
         self.logger.info("\n**** Domo API - Group Examples ****\n")
         groups = self.domo.groups
-    
+
         # Build a Group
         group_request = CreateGroupRequest()
         group_request.name = 'Groupy Group ' + str(randint(0, 10000))
@@ -257,7 +318,7 @@ class DomoSDKExamples:
         # Create a Group
         group = groups.create(group_request)
         self.logger.info("Created Group '" + group.name + "'")
-    
+
         # Get a Group
         group = groups.get(group.id)
         self.logger.info("Retrieved Group '" + group.name + "'")
@@ -298,3 +359,6 @@ examples.datasets()
 examples.streams()
 examples.users()
 examples.groups()
+
+#examples.users_authorities()
+#examples.roles()

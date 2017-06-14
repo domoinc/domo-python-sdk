@@ -3,6 +3,7 @@ from pydomo.datasets import DataSetClient
 from pydomo.groups import GroupClient
 from pydomo.streams import StreamClient
 from pydomo.users import UserClient
+from pydomo.roles import RoleClient
 import logging
 
 DOMO = """####################################################################################################
@@ -67,6 +68,7 @@ class Domo:
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.users = UserClient(self.transport, self.logger)
+        self.roles = RoleClient(self.transport, self.logger)
 
     @staticmethod
     def _init_logger(logger_name, logger_level):

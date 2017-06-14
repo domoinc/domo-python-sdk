@@ -56,6 +56,7 @@ class DomoAPITransport:
         return requests.request(method=method, url=url, headers=headers, data=body, params=params)
 
     def build_url(self, url):
+        self.logger.info("URL: " + self.apiHost + url)
         return self.apiHost + url
 
     @staticmethod
@@ -63,6 +64,7 @@ class DomoAPITransport:
         return jsonpickle.encode(obj, unpicklable=False)
 
     def json_to_obj(self, blob):
+        self.logger.info("JSON: " + str(blob))
         return json.loads(blob, object_hook=lambda json_dict: self._filter_reserved_words(json_dict))
 
     @staticmethod
