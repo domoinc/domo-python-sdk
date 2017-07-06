@@ -60,6 +60,8 @@ class DataSetClient(DomoAPIClient):
                 if limit and dataset_count >= limit:
                     return
 
+            print(params)
+
             params['offset'] += per_page
             if limit and params['offset'] + per_page > limit:
                 # Don't need to pull more than the limit

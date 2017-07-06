@@ -11,3 +11,5 @@ publishPypiLive.sh
 publishPypiTest.sh
 MANIFEST
 dist
+pydomo/roles/__pycache__
+pydomo/tests/__pycache__
