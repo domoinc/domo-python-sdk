@@ -100,7 +100,7 @@ class DataSetClient(DomoAPIClient):
         if response.status_code == requests.codes.ok:
             return response.text
         else:
-            raise Exception("Error downloading data from DataSet: " + str(response.json()))
+            raise Exception("Error downloading data from DataSet: " + self.transport.dump_response(response))
 
     """
         Export data to a CSV file, and return the readable/writable object file
@@ -109,7 +109,7 @@ class DataSetClient(DomoAPIClient):
         file_path = str(file_path)
         if '.csv' not in file_path:
             file_path += '.csv'
-        csv_str = self.data_export(dataset_id, include_csv_header)
+        csv_str = self.data_export(dataset_id, str(include_csv_header))
         with open(file_path, "w") as csv_file:
             csv_file.write(csv_str)
         return open(file_path, "r+")  # return the file object as readable and writable
