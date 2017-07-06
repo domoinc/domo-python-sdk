@@ -1,4 +1,12 @@
 # PyDomo Changelog
+### v0.1.3
+- Jul 6, 2017
+- Improvements:
+    - Better error descriptions, http request/response dumps on exception (requires requests_toolbelt)
+- Bug Fixes:
+    - Fixed Stream search (aldifahrezi)
+    - Fixed DataSet export authentication renewal
+
 ### v0.1.2
 - May 1, 2017
 - Added functionality to the Group Client:
