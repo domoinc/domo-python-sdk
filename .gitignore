@@ -7,9 +7,9 @@ pydomo/datasets/__pycache__
 pydomo/groups/__pycache__
 pydomo/streams/__pycache__
 pydomo/users/__pycache__
-publishPypiLive.sh
-publishPypiTest.sh
 MANIFEST
 dist
 pydomo/roles/__pycache__
 pydomo/tests/__pycache__
+publishPypiLive.sh
+publishPypiTest.sh
