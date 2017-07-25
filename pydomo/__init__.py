@@ -57,34 +57,23 @@ DOMO = """######################################################################
 ####################################################################################################
 ####################################################################################################"""
 
+parent_logger = logging.getLogger('pydomo')
+parent_logger.setLevel(logging.WARNING)
+
 
 class Domo:
-    def __init__(self, client_id, client_secret, api_host, use_https, logger_name, logger_level):
-        self.logger = self._init_logger(logger_name, logger_level)
-        self.logger.info("\n" + DOMO + "\n")
-        self.transport = DomoAPITransport(client_id, client_secret, api_host, use_https, self.logger)
+    def __init__(self, client_id, client_secret, api_host='api.domo.com', **kwargs):
+        if 'logger_name' in kwargs:
+            self.logger = parent_logger.getChild(kwargs['logger_name'])
+        else:
+            self.logger = parent_logger
+
+        if kwargs.get('log_level'):
+            self.logger.setLevel(kwargs['log_level'])
+        self.logger.debug("\n" + DOMO + "\n")
+
+        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger)
         self.streams = StreamClient(self.transport, self.logger)
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.users = UserClient(self.transport, self.logger)
-
-    @staticmethod
-    def _init_logger(logger_name, logger_level):
-        logger = logging.getLogger('pydomo-' + str(logger_name))
-        logger.setLevel(logger_level)
-
-        # console handler
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-
-        # formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-        return logger
-
-    def set_logging_level(self, level):
-        self.logger.setLevel(level)
-
-    def get_logger(self):
-        return self.logger

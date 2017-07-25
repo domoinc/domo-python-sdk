@@ -24,10 +24,14 @@ class DomoSDKExamples:
         client_id = 'MY_CLIENT_ID'
         client_secret = 'MY_CLIENT_SECRET'
         api_host = 'api.domo.com'
-        use_https = True
-        logger_name = 'foo'
-        logger_level = logging.INFO
-        self.domo = Domo(client_id, client_secret, api_host, use_https, logger_name, logger_level)
+
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        logging.getLogger().addHandler(ch)
+
+        self.domo = Domo(client_id, client_secret, api_host, logger_name='foo', log_level=logging.INFO)
         self.logger = self.domo.logger
 
     # DataSets are useful for data sources that only require occasional replacement

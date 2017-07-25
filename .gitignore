@@ -1,6 +1,7 @@
 *.iml
 *.ipr
 *.iws
+*.pyc
 math.csv
 pydomo/__pycache__
 pydomo/datasets/__pycache__

@@ -55,7 +55,7 @@ class DomoAPITransport:
         self.check_renew_token()
         headers = build_headers_func()
         url = self.build_url(url)
-        self.logger.info(method + " " + url + " " + str(body))
+        self.logger.debug('{} {} {}'.format(method, url, body))
         return requests.request(method=method, url=url, headers=headers, params=params, data=body)
 
     def build_url(self, url):
@@ -90,7 +90,7 @@ class DomoAPITransport:
             self.access_token = self._renew_access_token()
 
     def _renew_access_token(self):
-        self.logger.info("Renewing Access Token")
+        self.logger.debug("Renewing Access Token")
         url = self.apiHost + '/oauth/token?grant_type=client_credentials&scope=data user'
         response = requests.post(url=url, auth=HTTPBasicAuth(self.clientId, self.clientSecret))
         if response.status_code == requests.codes.ok:
