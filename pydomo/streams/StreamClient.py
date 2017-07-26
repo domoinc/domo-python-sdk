@@ -1,6 +1,7 @@
+import requests
+
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.Transport import HTTPMethod
-import requests
 
 """
     Streams
@@ -69,10 +70,14 @@ class StreamClient(DomoAPIClient):
         - Create a new Execution each time you would like to update your Domo DataSet
         - Be sure to 'commit' the Execution once all data parts have been uploaded
         - Do not create multiple Executions on a single Stream
+
+        update_method - update method to use for this execution. If None,
+                        the execution will use the stream's current setting.
     """
-    def create_execution(self, stream_id):
+    def create_execution(self, stream_id, update_method=None):
         url = self._base(stream_id) + '/executions'
-        return self._create(url, {}, {}, self.executionDesc)
+        body = {'updateMethod': update_method}
+        return self._create(url, body, {}, self.executionDesc)
 
     """
         Get a Stream Execution

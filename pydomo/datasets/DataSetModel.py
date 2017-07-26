@@ -107,3 +107,8 @@ class Sorting:
     NAME = 'name'
     STATUS = 'errorState'
     UPDATED = 'lastUpdated'
+
+
+class UpdateMethod:
+    APPEND = 'APPEND'
+    REPLACE = 'REPLACE'
