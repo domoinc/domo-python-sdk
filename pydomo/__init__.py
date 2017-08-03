@@ -1,6 +1,7 @@
 from pydomo.Transport import DomoAPITransport
 from pydomo.datasets import DataSetClient
 from pydomo.groups import GroupClient
+from pydomo.pages import PageClient
 from pydomo.streams import StreamClient
 from pydomo.users import UserClient
 import logging
@@ -73,7 +74,8 @@ class Domo:
         self.logger.debug("\n" + DOMO + "\n")
 
         self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger)
-        self.streams = StreamClient(self.transport, self.logger)
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
+        self.pages = PageClient(self.transport, self.logger)
+        self.streams = StreamClient(self.transport, self.logger)
         self.users = UserClient(self.transport, self.logger)
