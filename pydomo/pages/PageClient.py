@@ -3,13 +3,6 @@ import requests
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.Transport import HTTPMethod
 
-"""
-    Pages
-    - Programmatically manage Domo Pages
-    - Use DataSets for fairly static data sources that only require occasional updates via data replacement
-    - Docs: https://developer.domo.com/docs/data-apis/pages
-"""
-
 PAGE_DESC = "Page"
 COLLECTION_DESC = "Collection"
 URL_BASE = '/v1/pages'
@@ -44,7 +37,14 @@ COLLECTION_UPDATE_KWARGS = [
     'title'
 ]
 
+
 class PageClient(DomoAPIClient):
+    """
+        Pages
+        - Programmatically manage Domo Pages
+        - Docs: https://developer.domo.com/docs/data-apis/pages
+    """
+
     def create(self, name, **kwargs):
         """Create a new page.
 
@@ -75,13 +75,13 @@ class PageClient(DomoAPIClient):
 
     def get(self, page_id):
         """Get a page.
-        
+
         >>> page = domo.pages.get(page_id)
         >>> print(page)
         {'id': 123456789, 'parentId': 0, 'name': 'My Page',
         'locked': False, 'ownerId': 12345, 'cardIds': [],
         'visibility': {'userIds': 12345}}
-        
+
         :Parameters:
           - `page_id`: ID of the page to get
 
