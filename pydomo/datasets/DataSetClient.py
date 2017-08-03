@@ -112,7 +112,8 @@ class DataSetClient(DomoAPIClient):
         if response.status_code == requests.codes.ok:
             return response.text
         else:
-            raise Exception("Error downloading data from DataSet: " + self.transport.dump_response(response))
+            self.log.debug("Error downloading data from DataSet: " + self.transport.dump_response(response))
+            raise Exception("Error downloading data from DataSet: " + response.text)
 
     """
         Export data to a CSV file, and return the readable/writable object file

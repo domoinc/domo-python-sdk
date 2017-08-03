@@ -1,26 +1,24 @@
-from requests.auth import HTTPBasicAuth
-from collections import namedtuple
-import jsonpickle
 import requests
 import json
+from collections import namedtuple
+from requests.auth import HTTPBasicAuth
 from requests_toolbelt.utils import dump
 
 
-"""
-    HTTP Transport via the library 'requests'
-    - JSON Serialization via 'jsonpickle'
-    - JSON Deserialization via general mapping
-    - Authentication with the Domo API is handled automatically (OAuth2)
-"""
-
-
 class DomoAPITransport:
+    """Essentially a wrapper around the 'requests' library to make
+    it easier to interact with the Domo API.
+
+    OAuth2 authentication is handled automatically, as well as the
+    serialization and deserialization of objects.
+    """
+
     def __init__(self, client_id, client_secret, api_host, use_https, logger):
         self.apiHost = self._build_apihost(api_host, use_https)
         self.clientId = client_id
         self.clientSecret = client_secret
-        self.access_token = ''
         self.logger = logger
+        self._renew_access_token()
 
     @staticmethod
     def _build_apihost(host, use_https):
@@ -31,35 +29,58 @@ class DomoAPITransport:
         return host
 
     def get(self, url, params):
-        return self.request(url, HTTPMethod.GET, self._headers_default_receive_json, params, {})
+        headers = self._headers_default_receive_json()
+        return self.request(url, HTTPMethod.GET, headers, params)
 
     def get_csv(self, url, params):
-        return self.request(url, HTTPMethod.GET, self._headers_receive_csv, params, {})
+        headers = self._headers_receive_csv()
+        return self.request(url, HTTPMethod.GET, headers, params)
 
     def post(self, url, body, params):
-        return self.request(url, HTTPMethod.POST, self._headers_send_json, params, self._obj_to_json(body))
+        headers = self._headers_send_json()
+        return self.request(url, HTTPMethod.POST, headers, params,
+                            self._obj_to_json(body))
 
     def put(self, url, body):
-        return self.request(url, HTTPMethod.PUT, self._headers_send_json, {}, self._obj_to_json(body))
+        headers = self._headers_send_json()
+        return self.request(url, HTTPMethod.PUT, headers, {},
+                            self._obj_to_json(body))
 
     def put_csv(self, url, body):
-        return self.request(url, HTTPMethod.PUT, self._headers_send_csv, {}, body)
+        headers = self._headers_send_csv()
+        return self.request(url, HTTPMethod.PUT, headers, {}, body)
 
     def patch(self, url, body):
-        return self.request(url, HTTPMethod.PATCH, self._headers_send_json, {}, self._obj_to_json(body))
+        headers = self._headers_send_json()
+        return self.request(url, HTTPMethod.PATCH, headers, {},
+                            self._obj_to_json(body))
 
     def delete(self, url):
-        return self.request(url, HTTPMethod.DELETE, self._headers_default_receive_json, {}, {})
+        headers = self._headers_default_receive_json()
+        return self.request(url, HTTPMethod.DELETE, headers)
 
-    def request(self, url, method, build_headers_func, params, body):
-        self.check_renew_token()
-        headers = build_headers_func()
-        url = self.build_url(url)
+    def request(self, url, method, headers, params=None, body=None):
+        url = self.apiHost + url
         self.logger.debug('{} {} {}'.format(method, url, body))
-        return requests.request(method=method, url=url, headers=headers, params=params, data=body)
+        request_args = {'method': method, 'url': url, 'headers': headers,
+                        'params': params, 'data': body}
 
-    def build_url(self, url):
-        return self.apiHost + url
+        response = requests.request(**request_args)
+        if response.status_code == requests.codes.UNAUTHORIZED:
+            self._renew_access_token()
+            headers['Authorization'] = 'bearer ' + self.access_token
+            response = requests.request(**request_args)
+        return response
+
+    def _renew_access_token(self):
+        self.logger.debug("Renewing Access Token")
+        url = self.apiHost + '/oauth/token?grant_type=client_credentials'
+        response = requests.post(url=url, auth=HTTPBasicAuth(self.clientId, self.clientSecret))
+        if response.status_code == requests.codes.OK:
+            self.access_token = response.json()['access_token']
+        else:
+            self.logger.debug('Error retrieving access token: ' + self.dump_response(response))
+            raise Exception("Error retrieving a Domo API Access Token: " + response.text)
 
     def dump_response(self, response):
         data = dump.dump_all(response)
@@ -67,44 +88,7 @@ class DomoAPITransport:
 
     @staticmethod
     def _obj_to_json(obj):
-        return jsonpickle.encode(obj, unpicklable=False)
-
-    def json_to_obj(self, blob):
-        return json.loads(blob, object_hook=lambda json_dict: self._filter_reserved_words(json_dict))
-
-    @staticmethod
-    def _filter_reserved_words(json_dict):
-        keys = list(json_dict.keys())
-        i = 0
-        for key in keys:
-            if key == 'not':
-                keys[i] = 'NOT'
-            i += 1
-        return namedtuple('x', keys)(*json_dict.values())
-
-    def print_json(self, message, json_text):
-        self.logger.info(message + ": " + json.dumps(json_text, indent=4))
-
-    def check_renew_token(self):
-        if self._token_expired():
-            self.access_token = self._renew_access_token()
-
-    def _renew_access_token(self):
-        self.logger.debug("Renewing Access Token")
-        url = self.apiHost + '/oauth/token?grant_type=client_credentials&scope=data user'
-        response = requests.post(url=url, auth=HTTPBasicAuth(self.clientId, self.clientSecret))
-        if response.status_code == requests.codes.ok:
-            return response.json()['access_token']
-        else:
-            raise Exception("Error retrieving a Domo API Access Token: " + self.transport.dump_response(response))
-
-    def _token_expired(self):
-        token_expired = False
-        url = self.apiHost + '/v1/users/'
-        response = requests.get(url=url, headers=self._headers_default_receive_json())
-        if response.status_code == requests.codes.unauthorized:
-            token_expired = True
-        return token_expired
+        return json.dumps(obj, default=str)
 
     def _headers_default_receive_json(self):
         return {

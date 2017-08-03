@@ -12,7 +12,7 @@ Current Release: 0.1.3
 * The Domo API SDK is the simplest way to automate your Domo instance
 * The SDK streamlines the API programming experience, allowing you to significantly reduce your written code
 * This has not yet been tested with Python2
-* PyDomo has been published to [PyPI](https://pypi.python.org/pypi/pydomo), and can be installed via `pip3 install pydomo requests requests_toolbelt jsonpickle`
+* PyDomo has been published to [PyPI](https://pypi.python.org/pypi/pydomo), and can be installed via `pip3 install pydomo requests requests_toolbelt`
 
 ### Features:
 - DataSet and Personalized Data Policy (PDP) Management
@@ -37,7 +37,7 @@ Current Release: 0.1.3
     * Linux: 'apt-get install python3'
     * MacOS: 'brew install python3'
     * Windows: direct download, or use Bash on Windows 10
-* Install PyDomo and its dependencies via `pip3 install pydomo requests requests_toolbelt jsonpickle`
+* Install PyDomo and its dependencies via `pip3 install pydomo requests requests_toolbelt`
 
 ### Updates
 * Update your PyDomo package via `pip3 install pydomo --upgrade`

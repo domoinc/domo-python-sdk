@@ -1,36 +1,39 @@
-from pydomo.Transport import HTTPMethod
+import json
 import requests
 
-"""
-    DomoAPIClient
-    - Each API client class inherits from this superclass
-"""
+from pydomo.Transport import HTTPMethod
 
+class DomoAPIClient(object):
+    """DomoAPIClient
+    Each API client class inherits from this superclass
+    """
 
-class DomoAPIClient:
     def __init__(self, transport, logger):
         self.transport = transport
         self.logger = logger
 
     def _create(self, url, request, params, obj_desc):
         response = self.transport.post(url=url, params=params, body=request)
-        if response.status_code == requests.codes.created or response.status_code == requests.codes.ok:
-            obj = self.transport.json_to_obj(response.text)
-            self.transport.print_json("Created", str(response.json()))
+        if response.status_code in (requests.codes.CREATED, requests.codes.OK):
+            obj = response.json()
+            self.print_json("Created", obj)
             return obj
         else:
-            raise Exception("Error creating " + str(obj_desc) + ": " + self.transport.dump_response(response))
+            self.logger.debug("Error creating " + obj_desc + ": "
+                              + self.transport.dump_response(response))
+            raise Exception("Error creating " + obj_desc + ": " + response.text)
 
     def _get(self, url, obj_desc):
         response = self.transport.get(url=url, params={})
-        if response.status_code == requests.codes.ok:
-            obj = self.transport.json_to_obj(response.text)
-            return obj
+        if response.status_code == requests.codes.OK:
+            return response.json()
         else:
-            raise Exception("Error retrieving " + str(obj_desc) + ": " + self.transport.dump_response(response))
+            self.logger.debug("Error retrieving " + obj_desc + ": "
+                              + self.transport.dump_response(response))
+            raise Exception("Error retrieving " + obj_desc + ": "
+                            + response.text)
 
     def _update(self, url, method, success_code, obj_update, obj_desc):
-        response = ''
         if method == HTTPMethod.PUT:
             response = self.transport.put(url, obj_update)
         elif method == HTTPMethod.PATCH:
@@ -39,26 +42,33 @@ class DomoAPIClient:
             if str(response.text) == '':
                 return
             else:
-                obj = self.transport.json_to_obj(response.text)
-                self.transport.print_json("Updated", str(response.json()))
+                obj = response.json()
+                self.print_json("Updated", obj)
                 return obj
         else:
-            raise Exception("Error updating " + str(obj_desc) + ": " + self.transport.dump_response(response))
+            self.logger.debug("Error updating " + obj_desc + ": "
+                              + self.transport.dump_response(response))
+            raise Exception("Error updating " + obj_desc + ": "
+                            + response.text)
 
     def _list(self, url, params, obj_desc):
         response = self.transport.get(url=url, params=params)
-        if response.status_code == requests.codes.ok:
-            obj_list = self.transport.json_to_obj(response.text)
-            return obj_list
+        if response.status_code == requests.codes.OK:
+            return response.json()
         else:
-            raise Exception(obj_desc + " Error: " + self.transport.dump_response(response))
+            self.logger.debug(obj_desc + " Error: "
+                              + self.transport.dump_response(response))
+            raise Exception(obj_desc + " Error: " + response.text)
 
     def _delete(self, url, obj_desc):
         response = self.transport.delete(url=url)
-        if response.status_code == requests.codes.no_content:
+        if response.status_code == requests.codes.NO_CONTENT:
             return
         else:
-            raise Exception("Error deleting " + str(obj_desc) + ": " + self.transport.dump_response(response))
+            self.logger.debug("Error deleting " + obj_desc + ": "
+                              + self.transport.dump_response(response))
+            raise Exception("Error deleting " + obj_desc + ": "
+                            + response.text)
 
     def _upload_csv(self, url, success_code, csv, obj_desc):
         response = self.transport.put_csv(url=url, body=csv)
@@ -66,9 +76,19 @@ class DomoAPIClient:
             if str(response.text) == '':
                 return
             else:
-                return self.transport.json_to_obj(response.text)
+                return response.json()
         else:
-            raise Exception("Error uploading " + str(obj_desc) + ": " + self.transport.dump_response(response))
+            self.logger.debug("Error uploading " + obj_desc + ": " + self.transport.dump_response(response))
+            raise Exception("Error uploading " + obj_desc + ": "
+                            + response.text)
+
+    def _validate_params(self, params, accepted_keys):
+        bad_keys = list(set(params.keys()).difference(accepted_keys))
+        if bad_keys:
+           raise TypeError('Unexpected keyword arguments: {}'.format(bad_keys))
 
     def _base(self, obj_id):
         return self.urlBase + str(obj_id)
+
+    def print_json(self, message, json_obj):
+        self.logger.info(message + ": " + json.dumps(json_obj, indent=4))
