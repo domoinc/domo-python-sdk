@@ -83,10 +83,7 @@ class DataSetClient(DomoAPIClient):
         Import data from a CSV string
     """
     def data_import(self, dataset_id, csv, update_method=UpdateMethod.REPLACE):
-        url = '{base}/{dataset_id}/data?updateMethod={method}'.format(
-                base=URL_BASE, dataset_id=dataset_id, method=update_method)
-        return self._upload_csv(url, requests.codes.no_content, csv,
-                                DATA_SET_DESC)
+        return self._data_import(dataset_id, str.encode(csv), update_method)
 
     """
         Import data from a CSV file
@@ -96,7 +93,13 @@ class DataSetClient(DomoAPIClient):
         with open(os.path.expanduser(filepath), 'rb') as csvfile:
             # passing an open file to the requests library invokes http
             # streaming (uses minimal system memory)
-            self.data_import(dataset_id, csvfile, update_method)
+            self._data_import(dataset_id, csvfile, update_method)
+
+    def _data_import(self, dataset_id, csv, update_method):
+        url = '{base}/{dataset_id}/data?updateMethod={method}'.format(
+                base=URL_BASE, dataset_id=dataset_id, method=update_method)
+        return self._upload_csv(url, requests.codes.no_content, csv,
+                                DATA_SET_DESC)
 
     """
         Export data to a CSV string
@@ -110,7 +113,7 @@ class DataSetClient(DomoAPIClient):
         }
         response = self.transport.get_csv(url=url, params=params)
         if response.status_code == requests.codes.ok:
-            return response.text
+            return bytes.decode(response.content)
         else:
             self.log.debug("Error downloading data from DataSet: " + self.transport.dump_response(response))
             raise Exception("Error downloading data from DataSet: " + response.text)
@@ -120,7 +123,7 @@ class DataSetClient(DomoAPIClient):
     """
     def data_export_to_file(self, dataset_id, file_path, include_csv_header):
         file_path = str(file_path)
-        if '.csv' not in file_path:
+        if not file_path.endswith('.csv'):
             file_path += '.csv'
         csv_str = self.data_export(dataset_id, str(include_csv_header))
         with open(file_path, "w") as csv_file:
