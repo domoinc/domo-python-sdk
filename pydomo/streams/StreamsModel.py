@@ -1,28 +1,15 @@
-from pydomo.datasets.DataSetModel import DataSet
+from ..common import DomoObject
 
 
-class Stream:
-    def __init__(self):
-        self.id = 0
-        self.dataSet = DataSet()
-        self.updateMethod = ''
-        self.createdAt = ''
-        self.modifiedAt = ''
-
-
-class CreateStreamRequest:
+class CreateStreamRequest(DomoObject):
+    accepted_attrs = [
+        'dataSet',
+        'updateMethod'
+    ]
     def __init__(self, data_set_request, update_method):
+        super().__init__()
         self.dataSet = data_set_request
         self.updateMethod = update_method
-
-
-class Execution:
-    def __init__(self):
-        self.id = 0
-        self.startedAt = ''
-        self.currentState = ''
-        self.createdAt = ''
-        self.modifiedAt = ''
 
 
 class UpdateMethod:

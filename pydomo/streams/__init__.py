@@ -1,2 +1,2 @@
-from .StreamsModel import Stream, CreateStreamRequest, Execution, UpdateMethod
+from .StreamsModel import CreateStreamRequest, UpdateMethod
 from .StreamClient import StreamClient

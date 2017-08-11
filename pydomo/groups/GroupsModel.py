@@ -1,15 +1,10 @@
-class Group:
-    def __init__(self):
-        self.id = 0
-        self.name = ''
-        self.active = True
-        self.creatorId = ''
-        self.default = False
+from ..common import DomoObject
 
 
-class CreateGroupRequest:
-    def __init__(self):
-        self.name = ''
-        self.active = True
-        self.default = False
-        self.memberCount = 0
+class CreateGroupRequest(DomoObject):
+    accepted_attrs = [
+        'name',
+        'active',
+        'default',
+        'memberCount'
+    ]

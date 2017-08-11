@@ -1,5 +1,14 @@
-class Column:
+from ..common import DomoObject
+
+
+class Column(DomoObject):
+    accepted_attrs = [
+        'type',
+        'name'
+    ]
+
     def __init__(self, column_type, name):
+        super().__init__()
         self.type = column_type
         self.name = name
 
@@ -13,45 +22,12 @@ class ColumnType:
     DATETIME = 'DATETIME'
 
 
-class DataSetRequest:
-    def __init__(self):
-        self.name = ''
-        self.description = ''
-        self.schema = ''
-
-
-class DataSet:
-    def __init__(self):
-        self.id = 0
-        self.name = ''
-        self.description = ''
-        self.rows = 0
-        self.columns = 0
-        self.schema = Schema([])
-        self.owner = Owner()
-        self.createdAt = ''
-        self.updatedAt = ''
-
-
-class DataSetAndPDP(DataSet):
-    def __init__(self):
-        super().__init__()
-        self.pdpEnabled = False
-        self.policies = []
-
-
-class DataSetListResult:
-    def __init__(self):
-        self.id = 0
-        self.name = ''
-        self.description = ''
-        self.rows = 0
-        self.columns = 0
-        self.owner = Owner()
-        self.dataCurrentAt = ''
-        self.createdAt = ''
-        self.updatedAt = ''
-        self.pdpEnabled = False
+class DataSetRequest(DomoObject):
+    accepted_attrs = [
+        'name',
+        'description',
+        'schema'
+    ]
 
 
 class FilterOperator:
@@ -67,20 +43,15 @@ class FilterOperator:
     CONTAINS = 'CONTAINS'
 
 
-class Owner:
-    def __init__(self):
-        self.id = 0
-        self.name = ''
-
-
-class Policy:
-    def __init__(self):
-        self.id = 0
-        self.type = ''
-        self.name = ''
-        self.filters = []
-        self.users = []
-        self.groups = []
+class Policy(DomoObject):
+    accepted_attrs = [
+        'id',
+        'type',
+        'name',
+        'filters',
+        'users',
+        'groups'
+    ]
 
 
 class PolicyType:
@@ -88,15 +59,19 @@ class PolicyType:
     SYSTEM = 'system'
 
 
-class PolicyFilter:
-    def __init__(self):
-        self.column = ''
-        self.values = []
-        self.operator = ''
-        self.NOT = False
+class PolicyFilter(DomoObject):
+    accepted_attrs = [
+        'column',
+        'values',
+        'operator',
+        'not'
+    ]
 
 
-class Schema:
+class Schema(DomoObject):
+    accepted_attrs = [
+        'columns'
+    ]
     def __init__(self, columns):
         self.columns = columns
 

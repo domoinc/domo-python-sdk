@@ -1,16 +1,9 @@
-class CreateUserRequest:
-    def __init__(self):
-        self.name = ''
-        self.email = ''
-        self.role = ''
+from ..common import DomoObject
 
 
-class User:
-    def __init__(self):
-        self.id = ''
-        self.email = ''
-        self.role = ''
-        self.name = ''
-        self.createdAt = ''
-        self.updatedAt = ''
-        self.image = ''
+class CreateUserRequest(DomoObject):
+    accepted_attrs = [
+        'name',
+        'email',
+        'role'
+    ]
