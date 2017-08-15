@@ -3,9 +3,9 @@ from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
 from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
 from pydomo.groups import CreateGroupRequest
 from pydomo.streams import UpdateMethod, CreateStreamRequest
-from pydomo.users import CreateUserRequest
-from random import randint
 import logging
+
+import examples
 
 
 CLIENT_ID = 'YOUR CLIENT ID'
@@ -18,7 +18,7 @@ API_HOST = 'api.domo.com'
 
 class DomoSDKExamples:
     '''Domo Python SDK Usage
-    - Execute these examples/tests via 'python examples.py'
+    - Execute these examples/tests via 'python run_examples.py'
     - All created items are deleted at the end of their test
     - If you encounter a 'Not Allowed' error, this is a permissions
     issue. Please speak with your Domo Administrator.
@@ -38,15 +38,7 @@ class DomoSDKExamples:
         initialize multiple Domo() instances
         Docs: https://developer.domo.com/docs/domo-apis/getting-started
         '''
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s'
-                                      ' - %(message)s')
-        ch.setFormatter(formatter)
-        logging.getLogger().addHandler(ch)
-
-        self.domo = Domo(client_id, client_secret, logger_name='foo',
-                         log_level=logging.INFO, **kwargs)
+        self.domo = init_domo_client(client_id, client_secret, **kwargs)
         self.logger = self.domo.logger
 
     def datasets(self):
@@ -271,46 +263,6 @@ class DomoSDKExamples:
         # Delete the associated DataSet
         self.domo.datasets.delete(stream['dataSet']['id'])
 
-    def users(self):
-        '''User Docs: https://developer.domo.com/docs/domo-apis/users
-        '''
-        self.logger.info("\n**** Domo API - User Examples ****\n")
-        users = self.domo.users
-
-        # Build a User
-        user_request = CreateUserRequest()
-        user_request.name = 'Leonhard Euler'
-        user_request.email = 'leonhard.euler{}@domo.com'.format(
-                                                             randint(0, 10000))
-        user_request.role = 'Privileged'
-        send_invite = False
-
-        # Create a User
-        user = users.create(user_request, send_invite)
-        self.logger.info("Created User '{}'".format(user['name']))
-
-        # Get a User
-        user = users.get(user['id'])
-        self.logger.info("Retrieved User '" + user['name'] + "'")
-
-        # List Users
-        user_list = users.list(10, 0)
-        self.logger.info("Retrieved a list containing {} User(s)".format(
-                                                               len(user_list)))
-
-        # Update a User
-        user_update = CreateUserRequest()
-        user_update.name = 'Leo Euler'
-        user_update.email = 'leo.euler{}@domo.com'.format(randint(0, 10000))
-        user_update.role = 'Privileged'
-        user = users.update(user['id'], user_update)
-        self.logger.info("Updated User '{}': {}".format(user['name'],
-                                                        user['email']))
-
-        # Delete a User
-        users.delete(user['id'])
-        self.logger.info("Deleted User '{}'".format(user['name']))
-
     def groups(self):
         '''Group Docs:
         https://developer.domo.com/docs/domo-apis/group-apis
@@ -367,9 +319,22 @@ class DomoSDKExamples:
         self.logger.info("Deleted group '{}'".format(group['name']))
 
 
+def init_domo_client(client_id, client_secret, **kwargs):
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - '
+                                  '%(message)s')
+    ch.setFormatter(formatter)
+    logging.getLogger().addHandler(ch)
+
+    return Domo(client_id, client_secret, logger_name='foo',
+                log_level=logging.INFO, **kwargs)
+
+
 if __name__ == '__main__':
-    examples = DomoSDKExamples(CLIENT_ID, CLIENT_SECRET, api_host=API_HOST)
-    examples.datasets()
-    examples.streams()
-    examples.users()
-    examples.groups()
+    old_examples = DomoSDKExamples(CLIENT_ID, CLIENT_SECRET, api_host=API_HOST, use_https=False)
+    old_examples.datasets()
+    old_examples.groups()
+    #examples.pages_examples(old_examples.domo)
+    old_examples.streams()
+    examples.users_examples(old_examples.domo)
