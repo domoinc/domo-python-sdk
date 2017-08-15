@@ -1,5 +1,4 @@
-from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
-from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
+from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType
 from pydomo.streams import UpdateMethod, CreateStreamRequest
 
 
