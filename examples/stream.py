@@ -103,4 +103,4 @@ def streams(domo):
                      "deleted separately".format(stream['id']))
 
     # Delete the associated DataSet
-    self.domo.datasets.delete(stream['dataSet']['id'])
+    domo.datasets.delete(stream['dataSet']['id'])

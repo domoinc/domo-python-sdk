@@ -7,7 +7,7 @@ def groups(domo):
     https://developer.domo.com/docs/domo-apis/group-apis
     '''
     domo.logger.info("\n**** Domo API - Group Examples ****\n")
-    groups = self.domo.groups
+    groups = domo.groups
 
     # Build a Group
     group_request = CreateGroupRequest()
@@ -37,7 +37,7 @@ def groups(domo):
     domo.logger.info("Updated Group '{}'".format(group['name']))
 
     # Add a User to a Group
-    user_list = self.domo.users.list(10, 0)
+    user_list = domo.users.list(10, 0)
     user = user_list[0]
     groups.add_user(group['id'], user['id'])
     domo.logger.info("Added User {} to Group {}".format(user['id'],

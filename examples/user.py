@@ -3,7 +3,7 @@ from random import randint
 from pydomo.users import CreateUserRequest
 
 
-def users_examples(domo):
+def users(domo):
     '''User Docs: https://developer.domo.com/docs/domo-apis/users
     '''
     domo.logger.info("\n**** Domo API - User Examples ****\n")
