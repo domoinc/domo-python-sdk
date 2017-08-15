@@ -1,9 +1,6 @@
-from random import randint
+from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
+from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
 
-from pydomo.datasets import Column
-from pydomo.datasets import DataSetRequest
-from pydomo.datasets import Policy
-from pydomo.datasets import PolicyFilter
 
 def datasets(domo):
     '''DataSets are useful for data sources that only require

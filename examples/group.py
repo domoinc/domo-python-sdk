@@ -1,6 +1,6 @@
 from random import randint
-
 from pydomo.groups import CreateGroupRequest
+
 
 def groups(domo):
     '''Group Docs:

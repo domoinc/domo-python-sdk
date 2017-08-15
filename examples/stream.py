@@ -1,6 +1,7 @@
-from random import randint
+from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
+from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
+from pydomo.streams import UpdateMethod, CreateStreamRequest
 
-from pydomo.streams import CreateStreamRequest
 
 def streams(domo):
     '''Streams are useful for uploading massive data sources in
@@ -9,7 +10,7 @@ def streams(domo):
     Streams Docs: https://developer.domo.com/docs/data-apis/data
     '''
     domo.logger.info("\n**** Domo API - Stream Examples ****\n")
-    streams = self.domo.streams
+    streams = domo.streams
 
     # Define a DataSet Schema to populate the Stream Request
     dsr = DataSetRequest()
