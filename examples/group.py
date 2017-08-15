@@ -45,8 +45,8 @@ def groups(domo):
 
     # List Users in a Group
     user_list = groups.list_users(group['id'])
-    domo.logger.info("Retrieved a User list from a Group containing {} " \
-                     "User(s)".format(len(user_list)))
+    domo.logger.info("Retrieved a User list from a Group containing {} User(s)"
+                     .format(len(user_list)))
 
     # Remove a User from a Group
     groups.remove_user(group['id'], user['id'])

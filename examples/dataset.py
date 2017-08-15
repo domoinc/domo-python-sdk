@@ -37,7 +37,7 @@ def datasets(domo):
                             Column(ColumnType.STRING, 'Attending')])
     updated_dataset = datasets.update(dataset['id'], update)
     domo.logger.info("Updated DataSet {}: {}".format(updated_dataset['id'],
-                                                  updated_dataset['name']))
+                                                     updated_dataset['name']))
 
     # Import Data from a string
     csv_upload = '"Pythagoras","FALSE"\n"Alan Turing","TRUE"\n' \
@@ -98,7 +98,7 @@ def datasets(domo):
     # List Personalized Data Policies (PDP)
     pdp_list = datasets.list_pdps(dataset['id'])
     domo.logger.info("Retrieved a list containing {} PDP(s) for DataSet {}"
-                                     .format(len(pdp_list), dataset['id']))
+                     .format(len(pdp_list), dataset['id']))
 
     # Update a Personalized Data Policy (PDP)
     # Negate the previous filter (logical NOT). Note that in this case you
@@ -110,12 +110,12 @@ def datasets(domo):
     pdp_request.filters = [pdp_filter]
     pdp = datasets.update_pdp(dataset['id'], pdp['id'], pdp_request)
     domo.logger.info("Updated a Personalized Data Policy (PDP): {}, id: {}"
-                                           .format(pdp['name'], pdp['id']))
+                     .format(pdp['name'], pdp['id']))
 
     # Delete a Personalized Data Policy (PDP)
     datasets.delete_pdp(dataset['id'], pdp['id'])
     domo.logger.info("Deleted a Personalized Data Policy (PDP): {}, id: {}"
-                                           .format(pdp['name'], pdp['id']))
+                     .format(pdp['name'], pdp['id']))
 
     # Delete a DataSet
     datasets.delete(dataset['id'])

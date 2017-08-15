@@ -25,7 +25,7 @@ def streams(domo):
     # Create a Stream w/DataSet
     stream = streams.create(stream_request)
     domo.logger.info("Created Stream {} containing the new DataSet {}"
-                            .format(stream['id'], stream['dataSet']['id']))
+                     .format(stream['id'], stream['dataSet']['id']))
 
     # Get a Stream's metadata
     retrieved_stream = streams.get(stream['id'])
@@ -48,8 +48,8 @@ def streams(domo):
     # Search for Streams
     stream_property = 'dataSource.name:' + dsr.name
     searched_streams = streams.search(stream_property)
-    domo.logger.info("Stream search: there are {} Stream(s) with the " \
-               "DataSet title: {}".format(len(searched_streams), dsr.name))
+    domo.logger.info("Stream search: there are {} Stream(s) with the DataSet "
+                     "title: {}".format(len(searched_streams), dsr.name))
 
     # Create an Execution (Begin an upload process)
     execution = streams.create_execution(stream['id'])
@@ -100,8 +100,8 @@ def streams(domo):
 
     # Delete a Stream
     streams.delete(stream['id'])
-    domo.logger.info("Deleted Stream {}; the associated DataSet must be " \
-                                 "deleted separately".format(stream['id']))
+    domo.logger.info("Deleted Stream {}; the associated DataSet must be "
+                     "deleted separately".format(stream['id']))
 
     # Delete the associated DataSet
     self.domo.datasets.delete(stream['dataSet']['id'])
