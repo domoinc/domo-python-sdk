@@ -48,6 +48,6 @@ if __name__ == '__main__':
     domo = init_domo_client(CLIENT_ID, CLIENT_SECRET, api_host=API_HOST)
     examples.datasets(domo)
     examples.groups(domo)
-    #examples.pages(domo)
+    examples.pages(domo)
     examples.streams(domo)
     examples.users(domo)

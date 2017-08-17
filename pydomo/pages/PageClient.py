@@ -91,16 +91,43 @@ class PageClient(DomoAPIClient):
         url = '{base}/{page_id}'.format(base=URL_BASE, page_id=page_id)
         return self._get(url, PAGE_DESC)
 
-    def list(self):
+    def list(self, per_page=50, offset=0, limit=0):
         """List pages.
+        Returns a generator that will call the API multiple times
+        If limit is supplied and non-zero, returns up to limit pages
 
-        >>> domo.pages.list()
+        >>> list(domo.pages.list())
         [{'id': 123456789, 'name': 'My Page', 'children': []}, ...]
 
         :returns:
           - A list of dicts (with nesting possible)
         """
-        return self._list(URL_BASE, {}, PAGE_DESC)
+        # API uses pagination with a max of 50 per page
+        if per_page not in range(1, 51):
+            raise ValueError('per_page must be between 1 and 50 (inclusive)')
+        # Don't pull 50 values if user requests 10
+        if limit:
+            per_page = min(per_page, limit)
+
+        params = {
+            'limit': per_page,
+            'offset': offset,
+        }
+        page_count = 0
+
+        pages = self._list(URL_BASE, params, PAGE_DESC)
+        while pages:
+            for page in pages:
+                yield page
+                page_count += 1
+                if limit and page_count >= limit:
+                    return
+
+            params['offset'] += per_page
+            if limit and params['offset'] + per_page > limit:
+                # Don't need to pull more than the limit
+                params['limit'] = limit - params['offset']
+            pages = self._list(URL_BASE, params, PAGE_DESC)
 
     def update(self, page_id=None, **kwargs):
         """Update a page.
@@ -127,7 +154,7 @@ class PageClient(DomoAPIClient):
             updating the returned object, then passing it to update.
           - `name`: (optional) rename the page
           - `parentId`: (optional) turn page into subpage, or subpage
-            into top-level page if parentId is 0
+            into top-level page if parentId is present and falsey
           - `ownerId`: (optional) change owner of the page
           - `locked`: (optional) lock or unlock the page
           - `collectionIds`: (optional) reorder collections on page
@@ -144,6 +171,9 @@ class PageClient(DomoAPIClient):
                                  'supplied but do not match')
             page_id = kwargs['id']
             del kwargs['id']
+        if not kwargs.get('parentId', True):
+            # Check if parentId is present and falsey
+            kwargs['parentId'] = 0
 
         url = '{base}/{page_id}'.format(base=URL_BASE, page_id=page_id)
         return self._update(url,
