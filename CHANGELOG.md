@@ -1,4 +1,20 @@
 # PyDomo Changelog
+### v0.2.0
+- Aug 17, 2017
+- Added Pages:
+    - List, create, update, and delete pages
+    - List, create, update, and delete collections
+- Improvements:
+    - All endpoints now accept and return dictionaries. This will
+      likely break existing code, but it allows for returned objects
+      to be accepted as parameters.
+    - Removed dependency on jsonpickle library
+    - Eliminated an extra API call that was previously being used to
+      check if access token is valid
+    - Enable appending to datasets
+- Bug Fixes:
+    - Fixed unicode error when uploading/downloading unicode data
+
 ### v0.1.3
 - Jul 6, 2017
 - Improvements:

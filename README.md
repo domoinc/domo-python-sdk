@@ -5,14 +5,14 @@
 # Python3 - Domo API SDK (pydomo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
 
-Current Release: 0.1.3
+Current Release: 0.2.0
 
 ### About
 
 * The Domo API SDK is the simplest way to automate your Domo instance
 * The SDK streamlines the API programming experience, allowing you to significantly reduce your written code
-* This has not yet been tested with Python2
-* PyDomo has been published to [PyPI](https://pypi.python.org/pypi/pydomo), and can be installed via `pip3 install pydomo requests requests_toolbelt`
+* This is not compatible with Python2
+* PyDomo has been published to [PyPI](https://pypi.org/project/pydomo/), and can be installed via `pip3 install pydomo`
 
 ### Features:
 - DataSet and Personalized Data Policy (PDP) Management
@@ -31,13 +31,16 @@ Current Release: 0.1.3
 - Group Management
     - Create, update, and remove groups of users
     - Docs: https://developer.domo.com/docs/domo-apis/group-apis
+- Page Management
+    - Create, update, and delete pages
+    - Docs: https://developer.domo.com/docs/page-api-reference/page
 
 ### Setup
 * Install Python3: https://www.python.org/downloads/
     * Linux: 'apt-get install python3'
     * MacOS: 'brew install python3'
     * Windows: direct download, or use Bash on Windows 10
-* Install PyDomo and its dependencies via `pip3 install pydomo requests requests_toolbelt`
+* Install PyDomo and its dependencies via `pip3 install pydomo`
 
 ### Updates
 * Update your PyDomo package via `pip3 install pydomo --upgrade`
@@ -58,12 +61,11 @@ from pydomo import Domo
 client_id = 'MY_CLIENT_ID'
 client_secret = 'MY_CLIENT_SECRET'
 api_host = 'api.domo.com'
-use_https = True
 logger_name = 'foo'
-logger_level = logging.INFO
+log_level = logging.INFO
 
 # Create an instance of the SDK Client
-domo = Domo(client_id, client_secret, api_host, use_https, logger_name, logger_level)
+domo = Domo(client_id, client_secret, api_host=api_host, logger_name=logger_name, log_level=log_level)
 
 # Manage DataSets
 domo.datasets.create()
