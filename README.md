@@ -47,7 +47,7 @@ Current Release: 0.2.0
 * View the [changelog](CHANGELOG.md)
 
 ### Usage
-* See [examples.py](examples.py) for full usage
+* See [examples.py](run_examples.py) for full usage
 * Create an API Client on the [Domo Developer Portal](https://developer.domo.com/)
 * Use your API Client id/secret to instantiate pydomo 'Domo()'
 * Multiple API Clients can be used by instantiating multiple 'Domo()' clients
