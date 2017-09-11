@@ -45,6 +45,13 @@ class DomoAPITransport:
     def put_csv(self, url, body):
         return self.request(url, HTTPMethod.PUT, self._headers_send_csv, {}, body)
 
+    def put_csv_gzip(self, url, zipped_csv):
+        #files = {'file': open(zipped_csv, 'rb')}
+        files = {'file': (zipped_csv, open(zipped_csv, 'rb'), 'application/gzip')}
+        #files = {'file': zipped_csv}
+        url = self.build_url(url)
+        return requests.request(method=HTTPMethod.PUT, url=url, headers=self._headers_send_csv_gzip(), params={}, files=files)
+
     def patch(self, url, body):
         return self.request(url, HTTPMethod.PATCH, self._headers_send_json, {}, self._obj_to_json(body))
 
@@ -63,7 +70,17 @@ class DomoAPITransport:
 
     def dump_response(self, response):
         data = dump.dump_all(response)
-        return str(data.decode('utf-8'))
+        return str(data)
+
+
+# def dump_response(self, response):
+    #     data = dump.dump_all(response)
+    #     out = ""
+    #     try:
+    #         out = str(data.decode('utf-8'))
+    #     except Exception as e:
+    #         self.logger.error(e)
+    #     return out
 
     @staticmethod
     def _obj_to_json(obj):
@@ -120,6 +137,11 @@ class DomoAPITransport:
     def _headers_send_csv(self):
         headers = self._headers_default_receive_json()
         headers['Content-Type'] = 'text/csv'
+        return headers
+
+    def _headers_send_csv_gzip(self):
+        headers = self._headers_default_receive_json()
+        headers['Content-Type'] = 'application/gzip'
         return headers
 
     def _headers_receive_csv(self):

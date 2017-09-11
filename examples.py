@@ -21,10 +21,10 @@ class DomoSDKExamples:
         # Create an API client on https://developer.domo.com
         # Initialize the Domo SDK with your API client id/secret
         # If you have multiple API clients you would like to use, simply initialize multiple Domo() instances
-        client_id = 'MY_CLIENT_ID'
-        client_secret = 'MY_CLIENT_SECRET'
-        api_host = 'api.domo.com'
-        use_https = True
+        client_id = '7bd9f3ef-3dde-44ab-beed-3aa732a88f2b'
+        client_secret = '334ae0a584b182966a6d943effe37deb26fb927f456150615eb01475bb6b0c5e'
+        api_host = 'apigateway.sad-yoda.domorig.io'
+        use_https = False
         logger_name = 'foo'
         logger_level = logging.INFO
         self.domo = Domo(client_id, client_secret, api_host, use_https, logger_name, logger_level)
@@ -72,17 +72,22 @@ class DomoSDKExamples:
         csv_download = datasets.data_export(dataset.id, include_csv_header)
         self.logger.info("Downloaded data as a string from DataSet " + str(dataset.id) + ":\n" + str(csv_download))
 
-        # Export Data to a file (also returns the readable/writable file object)
+        # # Export Data to a file (also returns the readable/writable file object)
         csv_file_path = './math.csv'
         include_csv_header = True
         csv_file = datasets.data_export_to_file(dataset.id, csv_file_path, include_csv_header)
         csv_file.close()
         self.logger.info("Downloaded data as a file from DataSet " + str(dataset.id))
 
-        # Import Data from a file
+        # Import Data from a CSV file
         csv_file_path = './math.csv'
         datasets.data_import_from_file(dataset.id, csv_file_path)
         self.logger.info("Uploaded data from a file to DataSet " + str(dataset.id))
+
+        # Import Data from a zipped CSV file
+        # csv_file_path = './math.csv.zip'
+        # datasets.data_import_from_compressed_file(dataset.id, csv_file_path)
+        # self.logger.info("Uploaded data from a zipped file to DataSet " + str(dataset.id))
 
         # Personalized Data Policies (PDPs)
 
@@ -123,7 +128,7 @@ class DomoSDKExamples:
         datasets.delete_pdp(dataset.id, pdp.id)
         self.logger.info("Deleted a Personalized Data Policy (PDP) " + pdp.name + ", id: " + str(pdp.id))
 
-        # Delete a DataSet
+        # # Delete a DataSet
         datasets.delete(dataset.id)
         self.logger.info("Deleted DataSet " + str(dataset.id))
 
@@ -198,12 +203,12 @@ class DomoSDKExamples:
         streams.abort_current_execution(stream.id)
         self.logger.info("Aborted Executions on Stream " + str(stream.id))
 
-        # Delete a Stream
-        streams.delete(stream.id)
-        self.logger.info("Deleted Stream " + str(stream.id) + "; the associated DataSet must be deleted separately")
-
-        # Delete the associated DataSet
-        self.domo.datasets.delete(stream.dataSet.id)
+        # # Delete a Stream
+        # streams.delete(stream.id)
+        # self.logger.info("Deleted Stream " + str(stream.id) + "; the associated DataSet must be deleted separately")
+        #
+        # # Delete the associated DataSet
+        # self.domo.datasets.delete(stream.dataSet.id)
 
     def users(self):
         # User Docs: https://developer.domo.com/docs/domo-apis/users

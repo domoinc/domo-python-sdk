@@ -88,6 +88,15 @@ class DataSetClient(DomoAPIClient):
             self.data_import(dataset_id, csvfile)
 
     """
+        Import data from a zipped CSV file
+    """
+    def data_import_from_compressed_file(self, dataset_id, filepathname):
+        url = self._base(dataset_id) + '/data'
+        # with open(filepathname, 'rb') as csvfile:
+            # passing an open file to the requests library invokes http streaming (uses minimal system memory)
+        self._upload_compressed_csv(url, requests.codes.no_content, filepathname, self.dataSetDesc)
+
+    """
         Export data to a CSV string
     """
     def data_export(self, dataset_id, include_csv_header):
