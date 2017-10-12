@@ -53,7 +53,7 @@ Current Release: 0.2.0
 
 ### Usage
 * See [examples.py](run_examples.py) for full usage
-* To run this file, clone the domo-python-sdk repository, enter your ID and Secret in run_examples.py, and execute "python3 run_examples.py"
+* To run this file, copy/paste its contents, enter your ID and Secret (https://developer.domo.com/manage-clients), and execute "python3 run_examples.py"
 * Create an API Client on the [Domo Developer Portal](https://developer.domo.com/)
 * Use your API Client id/secret to instantiate pydomo 'Domo()'
 * Multiple API Clients can be used by instantiating multiple 'Domo()' clients
@@ -67,11 +67,16 @@ from pydomo import Domo
 client_id = 'MY_CLIENT_ID'
 client_secret = 'MY_CLIENT_SECRET'
 api_host = 'api.domo.com'
-logger_name = 'foo'
-log_level = logging.INFO
+
+# Configure the logger
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logging.getLogger().addHandler(handler)
 
 # Create an instance of the SDK Client
-domo = Domo(client_id, client_secret, api_host=api_host, logger_name=logger_name, log_level=log_level)
+domo = Domo(client_id, client_secret, logger_name='foo', log_level=logging.INFO, api_host=api_host)
 
 # Manage DataSets
 domo.datasets.create()
@@ -84,4 +89,7 @@ domo.users.create()
 
 # Manage User Groups
 domo.groups.create()
+
+# Manage Pages
+domo.pages.create()
 ```
