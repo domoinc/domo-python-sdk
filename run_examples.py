@@ -1,6 +1,5 @@
 '''Domo Python SDK Usage
-- To run this file, clone the domo-python-sdk repository, plug in your ID and Secret, and then run "python3 run_examples.py"
-- Execute these examples/tests via 'python run_examples.py'
+- To run this file, clone the domo-python-sdk repository, plug in your ID and Secret, and execute "python3 run_examples.py"
 - All created items are deleted at the end of their test
 - If you encounter a 'Not Allowed' error, this is a permissions
 issue. Please speak with your Domo Administrator.
