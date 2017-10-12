@@ -7,6 +7,11 @@
 
 Current Release: 0.2.0
 
+### Notice - Python Compatibility
+
+* PyDomo is written for Python3, and is not compatible with Python2
+* Execute scripts via 'python3', and updates via 'pip3'
+
 ### About
 
 * The Domo API SDK is the simplest way to automate your Domo instance
