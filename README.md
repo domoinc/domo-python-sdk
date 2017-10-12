@@ -48,6 +48,7 @@ Current Release: 0.2.0
 
 ### Usage
 * See [examples.py](run_examples.py) for full usage
+* To run this file, clone the domo-python-sdk repository, enter your ID and Secret in run_examples.py, and execute "python3 run_examples.py"
 * Create an API Client on the [Domo Developer Portal](https://developer.domo.com/)
 * Use your API Client id/secret to instantiate pydomo 'Domo()'
 * Multiple API Clients can be used by instantiating multiple 'Domo()' clients
