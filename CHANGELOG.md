@@ -1,4 +1,8 @@
 # PyDomo Changelog
+### v0.2.1
+- Oct 16, 2017
+- Improved csv downloading to disk, avoiding a potential python memory error
+
 ### v0.2.0
 - Aug 17, 2017
 - Added Pages:

@@ -63,7 +63,7 @@ class DomoAPITransport:
         url = self.apiHost + url
         self.logger.debug('{} {} {}'.format(method, url, body))
         request_args = {'method': method, 'url': url, 'headers': headers,
-                        'params': params, 'data': body}
+                        'params': params, 'data': body, 'stream': True}
 
         response = requests.request(**request_args)
         if response.status_code == requests.codes.UNAUTHORIZED:

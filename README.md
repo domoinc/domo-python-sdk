@@ -5,9 +5,9 @@
 # Python3 - Domo API SDK (pydomo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
 
-Current Release: 0.2.0
+Current Release: 0.2.1
 
-### Notice - Python Compatibility
+### Notice - Python 3 Compatibility
 
 * PyDomo is written for Python3, and is not compatible with Python2
 * Execute scripts via 'python3', and updates via 'pip3'
@@ -16,8 +16,8 @@ Current Release: 0.2.0
 
 * The Domo API SDK is the simplest way to automate your Domo instance
 * The SDK streamlines the API programming experience, allowing you to significantly reduce your written code
-* This is not compatible with Python2
-* PyDomo has been published to [PyPI](https://pypi.org/project/pydomo/), and can be installed via `pip3 install pydomo`
+* This SDK was written for Python3, and is not compatible with Python2
+* PyDomo has been published to [PyPI](https://pypi.org/project/pydomo/). The SDK can be easily installed via `pip3 install pydomo`, and can be updated via `pip3 install pydomo --upgrade`
 
 ### Features:
 - DataSet and Personalized Data Policy (PDP) Management

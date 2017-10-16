@@ -11,8 +11,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pydomo',
-    version='0.2.0',
-    description='The official python3 Domo API SDK - Domo, Inc.',
+    version='0.2.1',
+    description='The official Python3 Domo API SDK - Domo, Inc.',
     long_description=long_description,
     author='Bobby Swingler',
     author_email='bobby.swingler@domo.com',

@@ -17,6 +17,7 @@ DATA_SET_DESC = "DataSet"
 PDP_DESC = "Personalized Data Policy (PDP)"
 URL_BASE = '/v1/datasets'
 
+
 class DataSetClient(DomoAPIClient):
     def __init__(self, transport, logger):
         super(DataSetClient, self).__init__(transport, logger)
@@ -102,16 +103,12 @@ class DataSetClient(DomoAPIClient):
                                 DATA_SET_DESC)
 
     """
-        Export data to a CSV string
+        Export data to a CSV string (in-memory)
     """
     def data_export(self, dataset_id, include_csv_header):
         url = '{base}/{dataset_id}/data'.format(
                 base=URL_BASE, dataset_id=dataset_id)
-        params = {
-            'includeHeader': str(include_csv_header),
-            'fileName': 'foo.csv'
-        }
-        response = self.transport.get_csv(url=url, params=params)
+        response = self._download_csv(url, include_csv_header)
         if response.status_code == requests.codes.ok:
             return bytes.decode(response.content)
         else:
@@ -119,16 +116,20 @@ class DataSetClient(DomoAPIClient):
             raise Exception("Error downloading data from DataSet: " + response.text)
 
     """
-        Export data to a CSV file, and return the readable/writable object file
+        Export data to a CSV file (streams to disk)
     """
     def data_export_to_file(self, dataset_id, file_path, include_csv_header):
+        url = '{base}/{dataset_id}/data'.format(
+            base=URL_BASE, dataset_id=dataset_id)
+        response = self._download_csv(url, include_csv_header)
         file_path = str(file_path)
         if not file_path.endswith('.csv'):
             file_path += '.csv'
-        csv_str = self.data_export(dataset_id, str(include_csv_header))
-        with open(file_path, "w") as csv_file:
-            csv_file.write(csv_str)
-        return open(file_path, "r+")  # return the file object as readable and writable
+        with open(file_path, 'wb') as csv_file:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    csv_file.write(chunk)
+        return open(file_path, 'r+')  # return the file object as readable and writable
 
     """
         Delete a DataSet

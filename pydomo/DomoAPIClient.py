@@ -82,6 +82,12 @@ class DomoAPIClient(object):
             raise Exception("Error uploading " + obj_desc + ": "
                             + response.text)
 
+    def _download_csv(self, url, include_csv_header):
+        params = {
+            'includeHeader': str(include_csv_header)
+        }
+        return self.transport.get_csv(url=url, params=params)
+
     def _validate_params(self, params, accepted_keys):
         bad_keys = list(set(params.keys()).difference(accepted_keys))
         if bad_keys:
