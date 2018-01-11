@@ -1,4 +1,8 @@
 # PyDomo Changelog
+### v0.2.2.1
+- Jan 11, 2018
+- Circumventing issue in setup.py preventing installing via pip
+
 ### v0.2.2
 - Jan 11, 2018
 - Bug Fixes:
