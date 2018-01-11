@@ -1,4 +1,10 @@
 # PyDomo Changelog
+### v0.2.2
+- Jan 11, 2018
+- Bug Fixes:
+    - Fixed unicode error when uploading unicode data via stream client
+    - Dataset client referenced log instead of logger
+
 ### v0.2.1
 - Oct 16, 2017
 - Improved csv downloading to disk, avoiding a potential python memory error
