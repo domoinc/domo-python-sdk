@@ -105,7 +105,7 @@ class StreamClient(DomoAPIClient):
     def upload_part(self, stream_id, execution_id, part_num, csv):
         url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
         desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
-        return self._upload_csv(url, requests.codes.ok, csv, desc)
+        return self._upload_csv(url, requests.codes.ok, str.encode(csv), desc)
 
     """
         Commit an Execution (finalize a multi-part upload process)
