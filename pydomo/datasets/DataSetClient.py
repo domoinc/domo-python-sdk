@@ -112,7 +112,7 @@ class DataSetClient(DomoAPIClient):
         if response.status_code == requests.codes.ok:
             return bytes.decode(response.content)
         else:
-            self.log.debug("Error downloading data from DataSet: " + self.transport.dump_response(response))
+            self.logger.debug("Error downloading data from DataSet: " + self.transport.dump_response(response))
             raise Exception("Error downloading data from DataSet: " + response.text)
 
     """
