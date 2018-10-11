@@ -1,3 +1,4 @@
+import os
 import requests
 
 from pydomo.DomoAPIClient import DomoAPIClient
@@ -106,6 +107,12 @@ class StreamClient(DomoAPIClient):
         url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
         desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
         return self._upload_csv(url, requests.codes.ok, str.encode(csv), desc)
+
+    def upload_part_from_file(self, stream_id, execution_id, part_num, filepath):
+        with open(os.path.expanduser(filepath), 'rb') as csvfile:
+            url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
+            desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
+            return self._upload_csv(url, requests.codes.ok, csvfile, desc)
 
     """
         Commit an Execution (finalize a multi-part upload process)
