@@ -1,5 +1,6 @@
 import json
 import requests
+import zlib
 
 from pydomo.Transport import HTTPMethod
 
@@ -72,6 +73,19 @@ class DomoAPIClient(object):
 
     def _upload_csv(self, url, success_code, csv, obj_desc):
         response = self.transport.put_csv(url=url, body=csv)
+        if response.status_code == success_code:
+            if str(response.text) == '':
+                return
+            else:
+                return response.json()
+        else:
+            self.logger.debug("Error uploading " + obj_desc + ": " + self.transport.dump_response(response))
+            raise Exception("Error uploading " + obj_desc + ": "
+                            + response.text)
+
+    def _upload_gzip(self, url, success_code, csv, obj_desc):
+        post_data = zlib.compress(csv.read())
+        response = self.transport.put_gzip(url=url, body=post_data)
         if response.status_code == success_code:
             if str(response.text) == '':
                 return
