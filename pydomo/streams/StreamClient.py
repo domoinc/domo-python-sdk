@@ -1,5 +1,4 @@
 import os
-import gzip
 import requests
 
 from pydomo.DomoAPIClient import DomoAPIClient
@@ -109,23 +108,59 @@ class StreamClient(DomoAPIClient):
         desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
         return self._upload_csv(url, requests.codes.ok, str.encode(csv), desc)
 
-    def upload_part_from_file(self, stream_id, execution_id, part_num, filepath):
-        with open(os.path.expanduser(filepath), 'rb') as csvfile:
-            url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
-            desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
-            return self._upload_csv(url, requests.codes.ok, csvfile, desc)
+    def upload_csv_part_from_file(self, stream_id, execution_id, part_num, filepath, compression):
 
-    def upload_gzip_part_from_file(self, stream_id, execution_id, part_num, filepath):
-        with open(os.path.expanduser(filepath), 'rb') as csvfile:
-            url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
-            desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
-            return self._upload_gzip(url, requests.codes.ok, csvfile, desc)
+        url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
+        desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
 
-    def upload_part_from_gzip_file(self, stream_id, execution_id, part_num, filepath):
-        with gzip.open(os.path.expanduser(filepath), 'rb') as gzipfile:
-           url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
-           desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
-           return self._upload_gzip(url, requests.codes.ok, gzipfile, desc)
+        if compression == 'gzip':
+
+            import gzip
+
+            if filepath.endswith('.gz'):
+                with gzip.open(os.path.expanduser(filepath), 'rb') as gzipfile:
+                    return self._upload_csv(url, requests.codes.ok, gzipfile, desc)
+
+            else:
+                raise ValueError("Valid gzip extension is '.gz'")
+
+        else:
+            with open(os.path.expanduser(filepath), 'rb') as csvfile:
+                return self._upload_csv(url, requests.codes.ok, csvfile, desc)   
+
+    def upload_gzip_part_from_file(self, stream_id, execution_id, part_num, filepath, stream_file, chunk_size):
+        
+        import gzip
+
+        url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
+        desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
+
+        if stream_file:
+            
+            import io
+
+            compressed_body = io.BytesIO()
+            compressed_body.name = url
+            compressor = gzip.open(compressed_body, mode='wb')
+
+            with open(filepath, 'rb') as csvfile:
+                while True:
+                    chunk = csvfile.read(chunk_size)
+                    if not chunk:
+                        break
+                    compressor.write(chunk)
+
+            compressor.flush()
+            compressor.close()
+            compressed_body.seek(0, 0)
+            return self._upload_gzip(url, requests.codes.ok, compressed_body, desc)
+
+        else:
+
+            with open(os.path.expanduser(filepath), 'rb') as csvfile:
+                compressed_body = gzip.compress(csvfile.read())
+                return self._upload_gzip(url, requests.codes.ok, compressed_body, desc)
+
 
     """
         Commit an Execution (finalize a multi-part upload process)
