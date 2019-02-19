@@ -1,4 +1,4 @@
-from io
+import io
 import requests
 
 from pydomo.DomoAPIClient import DomoAPIClient
