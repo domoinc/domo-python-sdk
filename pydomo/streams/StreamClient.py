@@ -1,3 +1,4 @@
+import io
 import os
 import requests
 
@@ -101,12 +102,16 @@ class StreamClient(DomoAPIClient):
     """
         Upload a data part
         - Data sources should be broken into parts and uploaded in parallel
-        - Parts should be a minimum of 25mb
+        - Parts should be around 50MB
+        - Parts can file-like objects
+        - Parts can be compressed
     """
     def upload_part(self, stream_id, execution_id, part_num, csv):
         url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
         desc = "Data Part on Execution " + str(execution_id) + " on Stream " + str(stream_id)
-        return self._upload_csv(url, requests.codes.ok, str.encode(csv), desc)
+        if not isinstance(csv, io.IOBase):
+            csv = str.encode(csv)
+        return self._upload_csv(url, requests.codes.ok, csv, desc)
 
     def upload_csv_part_from_file(self, stream_id, execution_id, part_num, filepath, compression):
 
