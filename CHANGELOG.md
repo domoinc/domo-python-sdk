@@ -1,4 +1,11 @@
 # PyDomo Changelog
+
+### v0.2.3
+- Apr 18, 2019
+- Added GZIP support for Streams (Thank you @ldacey!)
+- Added file support for Streams (Thank you @jonemi!)
+- Added limit and offset support for listing Users in a Group
+
 ### v0.2.2.1
 - Jan 11, 2018
 - Circumventing issue in setup.py preventing installing via pip

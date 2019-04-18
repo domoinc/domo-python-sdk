@@ -100,7 +100,7 @@ class StreamClient(DomoAPIClient):
         return self._list(url, params, self.executionDesc)
 
     """
-        Upload a data part
+        Upload a data part (String or CSV)
         - Data sources should be broken into parts and uploaded in parallel
         - Parts should be around 50MB
         - Parts can file-like objects
@@ -113,6 +113,13 @@ class StreamClient(DomoAPIClient):
             csv = str.encode(csv)
         return self._upload_csv(url, requests.codes.ok, csv, desc)
 
+    """
+        Upload a data part CSV file
+        - Data sources should be broken into parts and uploaded in parallel
+        - Parts should be around 50MB
+        - Parts can file-like objects
+        - Parts can be compressed
+    """
     def upload_csv_part_from_file(self, stream_id, execution_id, part_num, filepath, compression):
 
         url = self._base(stream_id) + '/executions/' + str(execution_id) + '/part/' + str(part_num)
@@ -131,8 +138,15 @@ class StreamClient(DomoAPIClient):
 
         else:
             with open(os.path.expanduser(filepath), 'rb') as csvfile:
-                return self._upload_csv(url, requests.codes.ok, csvfile, desc)   
+                return self._upload_csv(url, requests.codes.ok, csvfile, desc)
 
+    """
+        Upload a data part GZIP file
+        - Data sources should be broken into parts and uploaded in parallel
+        - Parts should be around 50MB
+        - Parts can file-like objects
+        - Parts can be compressed
+    """
     def upload_gzip_part_from_file(self, stream_id, execution_id, part_num, filepath, stream_file, chunk_size):
         
         import gzip
