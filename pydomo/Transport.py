@@ -50,6 +50,10 @@ class DomoAPITransport:
         headers = self._headers_send_csv()
         return self.request(url, HTTPMethod.PUT, headers, {}, body)
 
+    def put_gzip(self, url, body):
+        headers = self._headers_send_gzip()
+        return self.request(url, HTTPMethod.PUT, headers, {}, body)
+
     def patch(self, url, body):
         headers = self._headers_send_json()
         return self.request(url, HTTPMethod.PATCH, headers, {},
@@ -104,6 +108,12 @@ class DomoAPITransport:
     def _headers_send_csv(self):
         headers = self._headers_default_receive_json()
         headers['Content-Type'] = 'text/csv'
+        return headers
+
+    def _headers_send_gzip(self):
+        headers = self._headers_default_receive_json()
+        headers['Content-Type'] = 'text/csv'
+        headers['Content-Encoding'] = 'gzip'
         return headers
 
     def _headers_receive_csv(self):

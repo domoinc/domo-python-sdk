@@ -82,6 +82,18 @@ class DomoAPIClient(object):
             raise Exception("Error uploading " + obj_desc + ": "
                             + response.text)
 
+    def _upload_gzip(self, url, success_code, csv, obj_desc):
+        response = self.transport.put_gzip(url=url, body=csv)
+        if response.status_code == success_code:
+            if str(response.text) == '':
+                return
+            else:
+                return response.json()
+        else:
+            self.logger.debug("Error uploading " + obj_desc + ": " + self.transport.dump_response(response))
+            raise Exception("Error uploading " + obj_desc + ": "
+                            + response.text)
+
     def _download_csv(self, url, include_csv_header):
         params = {
             'includeHeader': str(include_csv_header)
