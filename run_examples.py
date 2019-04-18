@@ -388,7 +388,9 @@ class DomoSDKExamples:
                                                             group['id']))
 
         # List Users in a Group
-        user_list = groups.list_users(group['id'])
+        limit = 50
+        offset = 0
+        user_list = groups.list_users(group['id'], limit, offset)
         domo.logger.info("Retrieved a User list from a Group containing {} User(s)"
                          .format(len(user_list)))
 
