@@ -61,10 +61,14 @@ class GroupClient(DomoAPIClient):
     """
         List Users in a Group
     """
-    def list_users(self, group_id):
+    def list_users(self, group_id, limit, offset):
         url = self._base(group_id) + '/users'
         desc = "a list of Users in a Group"
-        return self._get(url, desc)
+        params = {
+            'limit': str(limit),
+            'offset': str(offset),
+        }
+        return self._list(url, params, desc)
 
     """
         Remove a User to a Group
