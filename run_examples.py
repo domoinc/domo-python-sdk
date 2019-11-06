@@ -408,7 +408,7 @@ class DomoSDKExamples:
     # PAGES
     ############################
     def pages(self, domo):
-        '''Page Docs: https://developer.domo.com/docs/domo-apis/pages
+        '''Page Docs: https://developer.domo.com/docs/page-api-reference/page
         '''
         domo.logger.info("\n**** Domo API - Page Examples ****\n")
 
