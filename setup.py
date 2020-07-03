@@ -18,6 +18,7 @@ setup(
     version='0.2.3',
     description=description,
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Bobby Swingler',
     author_email='bobby.swingler@domo.com',
     url='https://github.com/domoinc/domo-python-sdk',
