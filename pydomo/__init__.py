@@ -83,6 +83,7 @@ class Domo:
         self.pages = PageClient(self.transport, self.logger)
         self.streams = StreamClient(self.transport, self.logger)
         self.users = UserClient(self.transport, self.logger)
+        self.accounts = AccountClient(self.transport, self.logger)
 
     ## Dataset functions for similar syntax and return datastructures as the rDomo package
     def ds_meta(self, dataset_id):
@@ -308,7 +309,7 @@ class Domo:
           - `page_id`: ID of the page the collection is on
           - `collection_id`: ID of the collection to delete
         """
-        return self.delete_collection(page_id, collection_id)
+        return self.pages.delete_collection(page_id, collection_id)
 
 
     def page_list(self, per_page=50, offset=0, limit=0):
@@ -392,7 +393,7 @@ class Domo:
         """
             List all groups in Domo instance in a pandas dataframe.
         """
-        return pd.DataFrame(self.groups.list(limit, offset))
+        return DataFrame(self.groups.list(limit, offset))
 
 
 
@@ -410,5 +411,18 @@ class Domo:
         """
         return self.groups.remove_user(group_id, user_id)
 
+######### Accounts ############
+    def accounts_list(self):
+        return list(self.accounts.list())
 
+    def accounts_get(self, account_id):
+        return self.accounts.get(account_id)
 
+    def accounts_delete(self, account_id):
+        return self.accounts.delete(account_id)
+
+    def accounts_create(self, **kwargs):
+        return self.accounts.create(**kwargs)
+
+    def accounts_update(self, account_id, **kwargs):
+        return self.accounts.update(account_id, **kwargs)
