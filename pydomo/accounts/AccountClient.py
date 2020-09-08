@@ -23,21 +23,10 @@ class AccountClient(DomoAPIClient):
     def create(self, **kwargs):
         """Create a new account.
 
-        >>> account = {
-              "name": "Leonhard Euler's XYZ Account",
-              'valid': True
-              "type": {
-                  "id": "xyz",
-                  "properties": {
-                      "password": "cyclops",
-                      "authenticateBy": "PASSWORD",
-                      "url": "https://mathematicians.xyz.com",
-                      "username": "leonhard.euler@mathematicians.com"
-                  }
-              }
-          }
+        >>> account = { 'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
         >>> new_account = domo.accounts.create(**account)
         >>> print(new_account)
+        {'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
 
 
         :Returns:
@@ -55,12 +44,10 @@ class AccountClient(DomoAPIClient):
 
         >>> account = domo.accounts.get(account_id)
         >>> print(account)
-        {'id': 123456789, 'parentId': 0, 'name': 'My account',
-        'locked': False, 'ownerId': 12345, 'cardIds': [],
-        'visibility': {'userIds': 12345}}
+        {'id': '40', 'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
 
         :Parameters:
-          - `account_id`: ID of the account to get
+          - `account_id`: ID of the account to get (str)
 
         :returns:
           - A dict representing the account
@@ -74,7 +61,14 @@ class AccountClient(DomoAPIClient):
         If limit is supplied and non-zero, returns up to limit accounts
 
         >>> list(domo.accounts.list())
-        [{'id': 123456789, 'name': 'My account', 'children': []}, ...]
+        [{'id': '40', 'name': 'DataSet Copy Test', ...},
+        {'id': '41', 'name': 'DataSet Copy Test2', ...}]
+
+        :Parameters:
+        - `per_page`:   results per page. Default 50 (int)
+        - `offset`:     offset if you need to paginate results. Default 0 (int)
+        - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
+            
 
         :returns:
           - A list of dicts (with nesting possible)
@@ -110,29 +104,16 @@ class AccountClient(DomoAPIClient):
         """Update a account.
 
         >>> print(domo.accounts.get(account_id))
-        {'id': 123456789, 'parentId': 0, 'name': 'My account',
-        'locked': False, 'ownerId': 12345, 'cardIds': [],
-        'visibility': {'userIds': 12345}}
-        >>> domo.accounts.update(account_id, locked=True,
-                              cardIds=[54321, 13579])
+        {'id': '40', 'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+        updatedAccount = {'name': 'DataSet Copy Test2, 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+        >>> domo.accounts.update(account_id, **updatedAccount)
         >>> print(domo.accounts.get(account_id))
-        {'id': 123456789, 'parentId': 0, 'name': 'My account',
-        'locked': True, 'ownerId': 12345, 'cardIds': [54321, 13579],
-        'visibility': {'userIds': 12345}}
+        {'id': '40', 'name': 'DataSet Copy Test2, 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
 
 
         :Parameters:
-          - `account_id`: ID of the account to update. Can also be provided
-            by supplying `id` to **kwargs. This allows for calling get,
-            updating the returned object, then passing it to update.
-          - `name`: (optional) rename the account
-          - `parentId`: (optional) turn account into subaccount, or subaccount
-            into top-level account if parentId is present and falsey
-          - `ownerId`: (optional) change owner of the account
-          - `locked`: (optional) lock or unlock the account
-          - `collectionIds`: (optional) reorder collections on account
-          - `cardIds`: (optional) specify which cards to have on account
-          - `visibility`: (optional) change who can see the account
+          - `account_id`: ID of the account to update.
+          - `kwargs`: New account object
         """
 
         url = '{base}/{account_id}'.format(base=URL_BASE, account_id=account_id)

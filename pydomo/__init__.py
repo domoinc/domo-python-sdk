@@ -85,26 +85,46 @@ class Domo:
         self.users = UserClient(self.transport, self.logger)
         self.accounts = AccountClient(self.transport, self.logger)
 
-    ## Dataset functions for similar syntax and return datastructures as the rDomo package
+######### Datasets #########
     def ds_meta(self, dataset_id):
         """
             Get a DataSet metadata
+
+            :Parameters:
+            - `dataset_id`: id of a dataset (str)
+
+            :Returns:
+            - A dict representing the dataset meta-data
         """
         return self.datasets.get(dataset_id)
 
     def ds_delete(self, dataset_id):
         """
             Delete a DataSet naming convention equivilent with rDomo
+            
+            :Parameters:
+            - `dataset_id`: id of a dataset (str)
         """
         return self.datasets.delete(dataset_id)
 
-    def ds_list(self, per_page=50, offset=0, limit=0, df_output = True):
+    def ds_list(self, df_output = True, per_page=50, offset=0, limit=0):
         """
             List DataSets
-            Returns either a list or dataframe with metadata of datasets
-            If limit is supplied and non-zero, returns up to limit datasets
+
+            >>> l = domo.ds_list(df_output=True)
+            >>> print(l.head())
+
+            :Parameters:
+            - `df_output`:  should the result be a dataframe. Default True (Boolean)
+            - `per_page`:   results per page. Default 50 (int)
+            - `offset`:     offset if you need to paginate results. Default 0 (int)
+            - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
+            
+            :Returns:
+            list or pandas dataframe depending on parameters
+
         """
-        l = self.datasets.list(per_page=50, offset=0, limit=0)
+        l = self.datasets.list(per_page, offset, limit)
         if df_output == False:
             out = list(l)
         else:
@@ -114,7 +134,18 @@ class Domo:
     def ds_query(self, dataset_id, query, return_data=True):
         """
             Evaluate query and return dataset in a dataframe
-            By default this will return a pandas dataframe. If return_data is set to false function will return a json object
+
+            >>> query = {"sql": "SELECT * FROM table LIMIT 2"}
+            >>> ds = domo.ds_query('80268aef-e6a1-44f6-a84c-f849d9db05fb', query)
+            >>> print(ds.head())
+
+            :Parameters:
+            - `dataset_id`:     id of a dataset (str)
+            - `query`:          query object (dict)
+            - `return_data`:    should the result be a dataframe. Default True (Boolean)
+            
+            :Returns:
+            dict or pandas dataframe depending on parameters
         """
         output = self.datasets.query(dataset_id, query)
         if(return_data == True):
@@ -122,17 +153,26 @@ class Domo:
         return output
 
 
-    def ds_get(self, dataset_id, include_csv_header=True):
+    def ds_get(self, dataset_id):
         """
             Export data to pandas Dataframe
+
+            >>> df = domo.ds_get('80268aef-e6a1-44f6-a84c-f849d9db05fb')
+            >>> print(df.head())
+
+            :Parameters:
+            - `dataset_id`:     id of a dataset (str)
+            
+            :Returns:
+            pandas dataframe
         """    
-        csv_download = self.datasets.data_export(dataset_id, include_csv_header)
+        csv_download = self.datasets.data_export(dataset_id, include_csv_header=True)
 
         content = StringIO(csv_download)
         df = read_csv(content)
         return df
 
-    ## PDP
+######### PDP #########
 
     def pdp_create(self, dataset_id, pdp_request):
         """
@@ -153,30 +193,87 @@ class Domo:
         ,   "not": false } ], "users": [ 27 ],"groups": [ ]}
 
         :Parameters:
-          - `dataset_id`: String Required  Id of the dataset PDP will be applied to
+          - `dataset_id`:   id of the dataset PDP will be applied to (String) Required 
           Policy Object:
-          - `name`:	String	Required	Name of the Policy
-          - `filters[].column`:	String	Required	Name of the column to filter on
-          - `filters[].not`:	Boolean	Required	Determines if NOT is applied to the filter operation
-          - `filters[].operator`:	String	Required	Matching operator (EQUALS)
-          - `filters[].values[]`:	String	Required	Values to filter on
-          - `type`:	String	Required	Type of policy (user or system)
-          - `users`:	Array	Required	List of user IDs the policy applies to
-          - `groups`:	Array	Required	List of group IDs the policy applies to
+          - `name`: Name of the Policy (String) Required
+          - `filters[].column`:	Name of the column to filter on (String) Required 
+          - `filters[].not`: Determines if NOT is applied to the filter operation (Boolean) Required
+          - `filters[].operator`: Matching operator (EQUALS) (String) Required 
+          - `filters[].values[]`: Values to filter on (String) Required 
+          - `type`: Type of policy (user or system) (String) Required 
+          - `users`: List of user IDs the policy applies to (array) Required
+          - `groups`: List of group IDs the policy applies to (array) Required
         """
         return self.datasets.create_pdp(dataset_id, pdp_request)
 
     def pdp_delete(self, dataset_id, policy_id):
+        """
+        Delete PDP Policy
+
+        >>> domo.pdp_delete('4405ff58-1957-45f0-82bd-914d989a3ea3', 35)
+
+        :Parameters:
+        - `dataset_id`: id of the dataset PDP will be applied to (String) Required 
+        - `policy_id`:  id of the policy to delete (String) Required
+        """
         return self.datasets.delete_pdp(dataset_id, policy_id)
 
-    def pdp_list(self, dataset_id):
-        return self.datasets.list_pdps(dataset_id)
+    def pdp_list(self, dataset_id, df_output = True):
+        """
+            List PDP policies
+
+            >>> l = domo.pdp_list(df_output=True)
+            >>> print(l.head())
+
+            :Parameters:
+            - `dataset_id`:   id of dataset with PDP policies (str) Required
+            - `df_output`:  should the result be a dataframe. Default True (Boolean)
+            
+            :Returns:
+            list or pandas dataframe depending on parameters
+
+        """
+        output = self.datasets.list_pdps(dataset_id)
+        if(df_output == True):
+            output = DataFrame(output)
+        return output
 
     def pdp_update(self, dataset_id, policy_id, policy_update):
+
+        """
+        Update a PDP policy
+
+        >>> policy = {
+          "name": "Only Show Attendees",
+          "filters": [ {
+            "column": "Attending",
+            "values": [ "TRUE" ],
+            "operator": "EQUALS"
+          } ],
+          "users": [ 27 ]
+        }
+        >>> domo.pdp_create('4405ff58-1957-45f0-82bd-914d989a3ea3', 4, policy)
+        {"id" : 8, "type": "user", "name": "Only Show Attendees"
+        , "filters": [{"column": "Attending", "values": [ "TRUE" ],   "operator": "EQUALS"
+        ,   "not": false } ], "users": [ 27 ],"groups": [ ]}
+
+        :Parameters:
+          - `dataset_id`:   id of the dataset PDP will be applied to (String) Required 
+          - `policy_id`:    id of the PDP pollicy that will be updated (String) Required 
+          Policy Object:
+          - `name`: Name of the Policy (String) Required
+          - `filters[].column`:	Name of the column to filter on (String) Required 
+          - `filters[].not`: Determines if NOT is applied to the filter operation (Boolean) Required
+          - `filters[].operator`: Matching operator (EQUALS) (String) Required 
+          - `filters[].values[]`: Values to filter on (String) Required 
+          - `type`: Type of policy (user or system) (String) Required 
+          - `users`: List of user IDs the policy applies to (array) Required
+          - `groups`: List of group IDs the policy applies to (array) Required
+        """
         return self.datasets.update_pdp(dataset_id, policy_id, policy_update)
 
 
-    ## Pages
+######### Pages #########
 
     def page_create(self, name, **kwargs):
         """Create a new page.
@@ -355,7 +452,7 @@ class Domo:
         return self.pages.update(page_id, **kwargs)
 
 
-    ## Groups
+######### Groups #########
 
     def groups_add_users(self, group_id, user_id):
         """
@@ -411,18 +508,77 @@ class Domo:
         """
         return self.groups.remove_user(group_id, user_id)
 
-######### Accounts ############
+######### Accounts #########
     def accounts_list(self):
+        """List accounts.
+        Returns a generator that will call the API multiple times
+        If limit is supplied and non-zero, returns up to limit accounts
+
+        >>> list(domo.accounts.list())
+        [{'id': '40', 'name': 'DataSet Copy Test', ...},
+        {'id': '41', 'name': 'DataSet Copy Test2', ...}]
+
+        :Parameters:
+        - `per_page`:   results per page. Default 50 (int)
+        - `offset`:     offset if you need to paginate results. Default 0 (int)
+        - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
+            
+
+        :returns:
+          - A list of dicts (with nesting possible)
+        """
         return list(self.accounts.list())
 
     def accounts_get(self, account_id):
+        """Get a account.
+
+        >>> account = domo.accounts.get(account_id)
+        >>> print(account)
+        {'id': '40', 'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+
+        :Parameters:
+          - `account_id`: ID of the account to get (str)
+
+        :returns:
+          - A dict representing the account
+        """
         return self.accounts.get(account_id)
 
     def accounts_delete(self, account_id):
+        """Delete a account.
+
+        :Parameters:
+          - `account_id`: ID of the account to delete
+        """
         return self.accounts.delete(account_id)
 
     def accounts_create(self, **kwargs):
+        """Create a new account.
+
+        >>> account = { 'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+        >>> new_account = domo.accounts.create(**account)
+        >>> print(new_account)
+        {'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+
+
+        :Returns:
+          - A dict representing the account
+        """
         return self.accounts.create(**kwargs)
 
     def accounts_update(self, account_id, **kwargs):
+        """Update a account.
+
+        >>> print(domo.accounts.get(account_id))
+        {'id': '40', 'name': 'DataSet Copy Test', 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+        updatedAccount = {'name': 'DataSet Copy Test2, 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+        >>> domo.accounts.update(account_id, **updatedAccount)
+        >>> print(domo.accounts.get(account_id))
+        {'id': '40', 'name': 'DataSet Copy Test2, 'valid': True, 'type': {'id': 'domo-csv', 'properties': {}}}
+
+
+        :Parameters:
+          - `account_id`: ID of the account to update.
+          - `kwargs`: New account object
+        """
         return self.accounts.update(account_id, **kwargs)
