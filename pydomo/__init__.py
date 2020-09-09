@@ -582,3 +582,23 @@ class Domo:
           - `kwargs`: New account object
         """
         return self.accounts.update(account_id, **kwargs)
+
+######### Users #########
+    def users_add(self, x_name, x_email, x_role, x_sendInvite=False):
+        uu = CreateUserRequest()
+        uu.name = x_name
+        uu.email = x_email
+        uu.role = x_role
+        return self.users.create(uu,x_sendInvite)
+
+    def users_get(self, user_id):
+        return self.users.get(user_id)
+
+    def users_list(self,df_output=True):
+        return self.users.list_all(df_output)
+
+    def users_update(self, user_id, user_def):
+        return self.users.update(user_id, user_def)
+
+    def users_delete(self, user_id):
+        return self.users.delete(user_id)
