@@ -1,5 +1,6 @@
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.Transport import HTTPMethod
+import pandas as pd
 import requests
 
 """
@@ -49,3 +50,25 @@ class UserClient(DomoAPIClient):
     """
     def delete(self, user_id):
         return self._delete(self._base(user_id), self.userDesc)
+
+    """
+        List all users
+    """
+    def list_all(self, df_output=True,batch_size=500):
+        i = 0
+        n_ret = 1
+        while n_ret > 0:
+            ll = self.list(batch_size,batch_size*i)
+            if( i == 0 ):
+                all = ll
+            else:
+                all.extend(ll)
+            i = i + 1
+            n_ret = ll.__len__()
+
+        out = all
+
+        if( df_output ):
+            out = pd.DataFrame(all)
+
+        return(out)
