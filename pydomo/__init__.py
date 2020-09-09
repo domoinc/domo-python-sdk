@@ -5,8 +5,10 @@ from pydomo.pages import PageClient
 from pydomo.streams import StreamClient
 from pydomo.users import UserClient
 from pydomo.accounts import AccountClient
+from pydomo.utilities import UtilitiesClient
 from pandas import read_csv
 from pandas import DataFrame
+from pandas import to_datetime
 from io import StringIO
 import logging
 
@@ -84,6 +86,7 @@ class Domo:
         self.streams = StreamClient(self.transport, self.logger)
         self.users = UserClient(self.transport, self.logger)
         self.accounts = AccountClient(self.transport, self.logger)
+        self.utilities = UtilitiesClient(self.transport, self.logger)
 
 ######### Datasets #########
     def ds_meta(self, dataset_id):
@@ -170,6 +173,15 @@ class Domo:
 
         content = StringIO(csv_download)
         df = read_csv(content)
+
+        # Convert to dates or datetimes if possible
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                try:
+                    df[col] = to_datetime(df[col])
+                except ValueError:
+                    pass
+
         return df
 
 ######### PDP #########
