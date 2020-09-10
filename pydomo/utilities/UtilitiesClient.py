@@ -3,12 +3,15 @@ import io
 import os
 import requests
 import json
+import math
+import sys
 
 import pandas as pd
 
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.Transport import HTTPMethod
 from pydomo.datasets import DataSetClient
+from pydomo.streams import StreamClient
 
 #from pydomo import Domo
 #dd = Domo('f537bdaf-2ecb-41bf-a2ff-26351f9cac3f','6b46c0fd7bf2f413f80e2637fd009babc06359dd590af49ba7a30ca9ea72b19d')
@@ -19,6 +22,8 @@ class UtilitiesClient(DomoAPIClient):
     def __init__(self, transport, logger):
         super(UtilitiesClient, self).__init__(transport, logger)
         self.ds = DataSetClient(self.transport, self.logger)
+        self.stream = StreamClient(self.transport, self.logger)
+        self.transport = transport
 
     def domo_schema(self, ds_id):
         this_get = self.ds.get(ds_id)
@@ -41,3 +46,55 @@ class UtilitiesClient(DomoAPIClient):
             result = 'DOUBLE'
 
         return result
+
+    def identical(self, c1, c2):
+        cc1 = json.dumps(c1)
+        cc2 = json.dumps(c2)
+        return cc1 == cc2
+
+    def get_stream_id(self, ds_id):
+        url = '/v1/streams/search?q=dataSource.id:{ds_id}'.format(ds_id=ds_id)
+        all_info = self._get(url,'Search to retrieve stream id')
+        return all_info[0]['id']
+
+    def estimate_chunk_rows(self, data, kbytes=10000):
+        sz = sys.getsizeof(data)
+        targetSize = kbytes * 3 # compression factor
+        data_rows = len(data.index)
+        ch_size = data_rows
+        if sz / 1000 > targetSize:
+            ch_size = math.floor(data_rows*(targetSize) / (sz/1000))
+        return(ch_size)
+
+    def stream_upload(self, ds_id, df_up):
+        domoSchema = self.domo_schema(ds_id)
+        dataSchema = self.data_schema(df_up)
+
+        stream_id = self.get_stream_id(ds_id)
+
+        if self.identical(domoSchema,dataSchema) == False:
+            new_schema = {'schema': {'columns': dataSchema}}
+            url = '/v1/datasets/{ds}'.format(ds=ds_id)
+            change_result = self.transport.put(url,new_schema)
+            print('Schema Updated')
+
+        exec_info = self.stream.create_execution(stream_id)
+        exec_id = exec_info['id']
+
+        chunksz = self.estimate_chunk_rows(df_up)
+        start = 0
+        df_rows = len(df_up.index)
+        end = df_rows
+        if df_rows > chunksz:
+            end = chunksz
+
+        while end <= df_rows:
+            df_sub = df_up.iloc[start:end, ]
+            csv = df_sub.to_csv(header=False,index=False)
+            self.stream.upload_part(stream_id, exec_id, start, csv)
+            start = end
+            end = end + chunksz
+
+        result = self.stream.commit_execution(stream_id, exec_id)
+
+        return {'exec_id': exec_id, 'result': result}
