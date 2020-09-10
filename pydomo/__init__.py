@@ -1,5 +1,9 @@
 from pydomo.Transport import DomoAPITransport
 from pydomo.datasets import DataSetClient
+from pydomo.datasets import DataSetRequest
+from pydomo.datasets import Schema
+from pydomo.datasets import Column
+from pydomo.datasets import ColumnType
 from pydomo.groups import GroupClient
 from pydomo.pages import PageClient
 from pydomo.streams import StreamClient
@@ -183,6 +187,23 @@ class Domo:
                     pass
 
         return df
+
+    def ds_create(self, df_up, name, description=''):
+        dsr = DataSetRequest()
+        dsr.name = name
+        dsr.description = description
+        dsr.schema = Schema([Column(ColumnType.STRING, 'tt1'),
+                             Column(ColumnType.STRING, 'tt2')])
+
+        new_ds_info = self.datasets.create(dsr)
+
+        self.utilities.stream_upload(new_ds_info['id'],df_up,warn_schema_change=False)
+
+        return new_ds_info['id']
+
+
+    def ds_update(self, ds_id, df_up):
+        return self.utilities.stream_upload(ds_id, df_up)
 
 ######### PDP #########
 

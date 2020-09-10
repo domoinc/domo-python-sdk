@@ -55,7 +55,7 @@ class UtilitiesClient(DomoAPIClient):
             ch_size = math.floor(data_rows*(targetSize) / (sz/1000))
         return(ch_size)
 
-    def stream_upload(self, ds_id, df_up):
+    def stream_upload(self, ds_id, df_up, warn_schema_change=True):
         domoSchema = self.domo_schema(ds_id)
         dataSchema = self.data_schema(df_up)
 
@@ -65,7 +65,8 @@ class UtilitiesClient(DomoAPIClient):
             new_schema = {'schema': {'columns': dataSchema}}
             url = '/v1/datasets/{ds}'.format(ds=ds_id)
             change_result = self.transport.put(url,new_schema)
-            print('Schema Updated')
+            if warn_schema_change:
+                print('Schema Updated')
 
         exec_info = self.stream.create_execution(stream_id)
         exec_id = exec_info['id']
