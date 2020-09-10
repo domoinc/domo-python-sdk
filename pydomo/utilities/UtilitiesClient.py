@@ -1,22 +1,11 @@
 
-import io
-import os
-import requests
 import json
 import math
 import sys
 
-import pandas as pd
-
 from pydomo.DomoAPIClient import DomoAPIClient
-from pydomo.Transport import HTTPMethod
 from pydomo.datasets import DataSetClient
 from pydomo.streams import StreamClient
-
-#from pydomo import Domo
-#dd = Domo('f537bdaf-2ecb-41bf-a2ff-26351f9cac3f','6b46c0fd7bf2f413f80e2637fd009babc06359dd590af49ba7a30ca9ea72b19d')
-#aa = dd.ds_get('77f0768d-5a4d-43c8-bbb4-0b30c83d2233')
-#dd.utilities.typeConversionText( dict(aa.dtypes)['Date Column'])
 
 class UtilitiesClient(DomoAPIClient):
     def __init__(self, transport, logger):
@@ -97,4 +86,4 @@ class UtilitiesClient(DomoAPIClient):
 
         result = self.stream.commit_execution(stream_id, exec_id)
 
-        return {'exec_id': exec_id, 'result': result}
+        return result
