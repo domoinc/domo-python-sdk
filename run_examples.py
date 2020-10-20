@@ -24,7 +24,7 @@ from pydomo import Domo
 from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
 from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
 from pydomo.users import CreateUserRequest
-from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType
+#from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType. #duplicated on line 24
 from pydomo.streams import UpdateMethod, CreateStreamRequest
 from pydomo.groups import CreateGroupRequest
 
