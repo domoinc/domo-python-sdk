@@ -131,7 +131,7 @@ class Domo:
             list or pandas dataframe depending on parameters
 
         """
-        l = self.datasets.list(per_page, offset, limit)
+        l = self.datasets.list()
         if df_output == False:
             out = list(l)
         else:
