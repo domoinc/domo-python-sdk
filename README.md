@@ -1,7 +1,3 @@
-<div align="center">
-  <img src="domo.png" width="400" height="400"/>
-</div>
-
 # Python3 - Domo API SDK (pydomo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
 
@@ -22,13 +18,9 @@ Current Release: 0.2.3
 ### Features:
 - DataSet and Personalized Data Policy (PDP) Management
     - Use DataSets for fairly static data sources that only require occasional updates via data replacement
+    - This SDK automates the use of Domo Streams so that uploads are always as fast as possible
     - Add Personalized Data Policies (PDPs) to DataSets (hide sensitive data from groups of users)
     - Docs: https://developer.domo.com/docs/domo-apis/data
-- Stream Management
-    - A Domo Stream is a specialized upload pipeline pointing to a single Domo DataSet
-    - Use Streams for massive, constantly changing, or rapidly growing data sources
-    - Streams support accelerated uploading via parallel data uploads
-    - Docs: https://developer.domo.com/docs/domo-apis/stream-apis
 - User Management
     - Create, update, and remove users
     - Major use case: LDAP/Active Directory synchronization
@@ -93,3 +85,40 @@ domo.groups.create()
 # Manage Pages
 domo.pages.create()
 ```
+
+### Available Functions
+The functions in this package match most parts of the API documented at [developer.domo.com](https://developer.domo.com/) and follow a specific convention. Each set of functions is preceeded by the portion of the API it operates on. The following lists all the sets of functions available in this package. For further help, refer to the help function in Python.
+* **Data sets** - This set of functions is designed to transfer data in and out of Domo.
+	* **ds_get** - downloads data from Domo
+	* **ds_create** - creates a new data set
+	* **ds_update** - updates an existing data set, only data sets created by the API can be updated
+	* **ds_meta** - downloads meta data regarding a single data set
+	* **ds_list** - downloads a list of data sets in your Domo instance
+	* **ds_delete** - deletes a data set (be careful)
+	* **ds_query** - allows you to send a query to a data set, Domo will evaluate that query and sends the results back as a list or a tibble
+	* **ds_rename** - renames an existing data set
+* **Groups** - This set of functions modifies and creates groups.
+	* **groups_add_users** - adds users to an existing group
+	* **groups_create** - create a group
+	* **groups_delete** - delete an existing group
+	* **groups_list** - list all groups
+	* **groups_remove_users** - remove users from a group
+	* **groups_list_users** - list users in a group
+* **Pages** - functions related to managing Domo pages
+	* **page_update** - update a page
+	* **page_list** - list all pages
+	* **page_get_collections** - list all collections on a page
+	* **page_get** - get information regarding a page
+	* **page_create** - create a page
+* **PDP** - functions to manage PDP
+	* **pdp_update** - update an existing PDP policy
+	* **pdp_list** - list all PDP policies
+	* **pdp_enable** - toggle PDP on and off
+	* **pdp_delete** - delete a PDP policy
+	* **pdp_create** - create a PDP policy
+* **Users** - functions to manage users
+	* **users_delete** - delete a user
+	* **users_update** - update a user
+	* **users_list** - list all users
+	* **users_get** - get a single user record
+	* **users_add** - create a user (or users)
