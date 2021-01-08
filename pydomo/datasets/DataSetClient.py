@@ -1,5 +1,8 @@
 import os
 import requests
+from pandas import read_csv
+from pandas import DataFrame
+from io import StringIO
 
 from pydomo.datasets import Sorting, UpdateMethod
 from pydomo.DomoAPIClient import DomoAPIClient
@@ -179,3 +182,11 @@ class DataSetClient(DomoAPIClient):
         url = '{base}/{dataset_id}/policies/{policy_id}'.format(
                 base=URL_BASE, dataset_id=dataset_id, policy_id=policy_id)
         return self._delete(url, PDP_DESC)
+    
+    """
+        Query's Dataset
+    """
+    def query(self, dataset_id, query):
+        url = '{base}/query/execute/{dataset_id}'.format(
+                base=URL_BASE, dataset_id=dataset_id)
+        return self._create(url, query, {}, 'query')

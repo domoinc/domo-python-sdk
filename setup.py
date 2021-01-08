@@ -15,7 +15,7 @@ except FileNotFoundError as fnfe:
 
 setup(
     name='pydomo',
-    version='0.2.3',
+    version='0.3.0',
     description=description,
     long_description=long_description,
     author='Bobby Swingler',
