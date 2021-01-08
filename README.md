@@ -1,7 +1,7 @@
 # Python3 - Domo API SDK (pydomo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
 
-Current Release: 0.2.3
+Current Release: 0.3.0
 
 ### Notice - Python 3 Compatibility
 
