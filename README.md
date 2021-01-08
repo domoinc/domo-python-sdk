@@ -44,46 +44,60 @@ Current Release: 0.2.3
 * View the [changelog](CHANGELOG.md)
 
 ### Usage
-* See [examples.py](run_examples.py) for full usage
-* To run this file, copy/paste its contents, enter your ID and Secret (https://developer.domo.com/manage-clients), and execute "python3 run_examples.py"
+Below are examples of how to use the SDK to perform a few common tasks. To run similar code on your system, do the following.
 * Create an API Client on the [Domo Developer Portal](https://developer.domo.com/)
 * Use your API Client id/secret to instantiate pydomo 'Domo()'
 * Multiple API Clients can be used by instantiating multiple 'Domo()' clients
 * Authentication with the Domo API is handled automatically by the SDK
 * If you encounter a 'Not Allowed' error, this is a permissions issue. Please speak with your Domo Administrator.
 ```python
-import logging
 from pydomo import Domo
 
-# Build an SDK configuration
-client_id = 'MY_CLIENT_ID'
-client_secret = 'MY_CLIENT_SECRET'
-api_host = 'api.domo.com'
+domo = Domo('client-id','secret',api_host='api.domo.com')
 
-# Configure the logger
-handler = logging.StreamHandler()
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logging.getLogger().addHandler(handler)
+# Download a data set from Domo
+car_data = domo.ds_get('2f09a073-54a4-4269-8c62-b776e67d59f0')
 
-# Create an instance of the SDK Client
-domo = Domo(client_id, client_secret, logger_name='foo', log_level=logging.INFO, api_host=api_host)
+# Create a summary data set, taking the mean of dollars by make and model.
+car_summary = car_data.groupby(['make','model']).agg({'dollars':'mean'}).reset_index()
 
-# Manage DataSets
-domo.datasets.create()
 
-# Manage Streams
-domo.streams.create()
+# Create a new data set in Domo with the result, the return value is the data set id of the new data set.
+car_ds = domo.ds_create(car_summary,'Python | Car Summary Data Set','Python | Generated during demo')
 
-# Manage Users
-domo.users.create()
+# Modify summary and then upload to the data set we already created. The SDK will update the data set schema automatically.
+car_summary2 = car_data.groupby(['make','model'],as_index=False).agg({'dollars':'mean','email':'count'}).reset_index()
+car_update = domo.ds_update(car_ds,car_summary2)
 
-# Manage User Groups
-domo.groups.create()
 
-# Manage Pages
-domo.pages.create()
+# Create PDP Policy
+from pydomo.datasets import Policy, PolicyFilter, FilterOperator, PolicyType, Sorting
+
+# Create policy filters
+pdp_filter = PolicyFilter()
+pdp_filter.column = 'make'  # The DataSet column to filter on
+pdp_filter.operator = FilterOperator.EQUALS
+pdp_filter.values = ['Honda']  # The DataSet row value to filter on
+
+pdp_request = Policy()
+pdp_request.name = 'Python | US East'
+pdp_request.filters = [pdp_filter]
+pdp_request.type = PolicyType.USER
+pdp_request.users = []
+pdp_request.groups = [1631291223]
+
+domo.pdp_create(car_ds,pdp_request)
+
+
+# Interact with groups
+all_groups = domo.groups_list() # List all groups
+all_users = domo.users_list() # List all users
+
+# List all users in US South Division
+domo.groups_list_users(328554991)
+
+added_users = domo.groups_add_users(328554991,2063934980)
+domo.groups_list_users(328554991)
 ```
 
 ### Available Functions
