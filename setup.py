@@ -17,7 +17,7 @@ setup(
     name='pydomo',
     version='0.3.0',
     description=description,
-    long_description=long_description,
+    long_description='See https://github.com/domoinc/domo-python-sdk for more details.',
     author='Bobby Swingler',
     author_email='bobby.swingler@domo.com',
     url='https://github.com/domoinc/domo-python-sdk',
