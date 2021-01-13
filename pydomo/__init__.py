@@ -105,14 +105,23 @@ class Domo:
         """
         return self.datasets.get(dataset_id)
 
-    def ds_delete(self, dataset_id):
+    def ds_delete(self, dataset_id, prompt_before_delete=True):
         """
-            Delete a DataSet naming convention equivilent with rDomo
+            Delete a DataSet naming convention equivalent with rdomo
             
             :Parameters:
             - `dataset_id`: id of a dataset (str)
         """
-        return self.datasets.delete(dataset_id)
+
+        del_data = 'Y'
+        if prompt_before_delete:
+            del_data = input("Permanently delete this data set? This is destructive and cannot be reversed. (Y/n)")
+
+        out = 'Data set not deleted'
+        if del_data == 'Y':
+            out = self.datasets.delete(dataset_id)
+
+        return out
 
     def ds_list(self, df_output = True, per_page=50, offset=0, limit=0):
         """
