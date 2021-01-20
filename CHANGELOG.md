@@ -1,5 +1,32 @@
 # PyDomo Changelog
 
+### v0.3.0.1
+January 21, 2021
+
+Bug Fixes
+* ds_query fixed to accept a data set id and a SQL query
+* ds_delete now requires confirmation before deleting a data set
+    * use prompt_before_delete=False to force delete
+* group functions modified to match rdomo, prior to this release these functions did not work correctly
+    * groups_add_users now adds multiple users at a time
+    * groups_create now takes a group name and a list of users
+    * groups_list now pages through all lists automatically
+    * groups_list_users now pages through all users automatically
+    * groups_remove_users now removes a list of users
+    * groups_delete now removes all users from the group and then deletes the group 
+
+### v0.3.0
+January 8, 2021
+
+The primary objective of this release is to make it easier to interact with Domo via Python and to sync functionality with the R SDK. The following changes have been made.
+* Methods were added to the primary object so that the sub-objects don't need to be used.
+* Method names sync'd with functions from the R SDK
+* Method names follow a specific naming convention for ease of use
+* Methods to download data from Domo now return a Pandas dataframe
+* Methods to upload data to Domo now take a Pandas dataframe as an input
+* Uploading data is now easier as interactions with the streams API are abstracted
+* All methods prior to these updates are unchanged, existing code should continue to work w/o issue
+
 ### v0.2.3
 - Apr 18, 2019
 - Added GZIP support for Streams (Thank you @ldacey!)
