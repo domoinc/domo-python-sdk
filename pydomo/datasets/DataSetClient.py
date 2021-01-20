@@ -189,4 +189,5 @@ class DataSetClient(DomoAPIClient):
     def query(self, dataset_id, query):
         url = '{base}/query/execute/{dataset_id}'.format(
                 base=URL_BASE, dataset_id=dataset_id)
-        return self._create(url, query, {}, 'query')
+        req_body = {'sql':query}
+        return self._create(url, req_body, {}, 'query')

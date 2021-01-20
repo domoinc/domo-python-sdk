@@ -8,6 +8,7 @@ from pydomo.groups import GroupClient
 from pydomo.pages import PageClient
 from pydomo.streams import StreamClient
 from pydomo.users import UserClient
+from pydomo.users import CreateUserRequest
 from pydomo.accounts import AccountClient
 from pydomo.utilities import UtilitiesClient
 from pandas import read_csv
@@ -105,14 +106,23 @@ class Domo:
         """
         return self.datasets.get(dataset_id)
 
-    def ds_delete(self, dataset_id):
+    def ds_delete(self, dataset_id, prompt_before_delete=True):
         """
-            Delete a DataSet naming convention equivilent with rDomo
+            Delete a DataSet naming convention equivalent with rdomo
             
             :Parameters:
             - `dataset_id`: id of a dataset (str)
         """
-        return self.datasets.delete(dataset_id)
+
+        del_data = 'Y'
+        if prompt_before_delete:
+            del_data = input("Permanently delete this data set? This is destructive and cannot be reversed. (Y/n)")
+
+        out = 'Data set not deleted'
+        if del_data == 'Y':
+            out = self.datasets.delete(dataset_id)
+
+        return out
 
     def ds_list(self, df_output = True, per_page=50, offset=0, limit=0):
         """
@@ -491,15 +501,27 @@ class Domo:
         """
             Add a User to a Group
         """
-        return self.groups.add_user(group_id, user_id)
+
+        if isinstance(user_id,list):
+            for x in user_id:
+                self.groups.add_user(group_id, x)
+        else:
+            self.groups.add_user(group_id, user_id)
+
+        return 'success'
 
 
 
-    def groups_create(self, group_request):
+    def groups_create(self, group_name, users=-1, active='true'):
         """
             Create a Group
         """
-        return self.groups.create(group_request)
+        req_body = {'name':group_name,'active':active}
+        grp_created = self.groups.create(req_body)
+        if (not isinstance(users,list) and users > 0) or isinstance(users,list):
+            self.groups_add_users(grp_created['id'],users)
+
+        return grp_created
 
 
 
@@ -507,6 +529,8 @@ class Domo:
         """
             Delete a Group
         """
+        existing_users = self.groups_list_users(group_id)
+        self.groups_remove_users(group_id,existing_users)
         return self.groups.delete(group_id)
 
 
@@ -519,19 +543,37 @@ class Domo:
 
 
 
-    def groups_list(self, limit=1000, offset=0):
+    def groups_list(self):
         """
             List all groups in Domo instance in a pandas dataframe.
         """
-        return DataFrame(self.groups.list(limit, offset))
+        grps = []
+        n_ret = 1
+        off = 0
+        batch_size = 500
+        while n_ret > 0:
+            gg = self.groups.list(batch_size,off*batch_size)
+            grps.extend(gg)
+            n_ret = gg.__len__()
+            off += 1
+        return DataFrame(grps)
 
 
-
-    def groups_list_users(self, group_id, limit=1000, offset=0):
+    def groups_list_users(self, group_id):
         """
             List Users in a Group
         """
-        return self.groups.list_users(group_id, limit, offset)
+        user_list = []
+        n_ret = 1
+        off = 0
+        batch_size=500
+        while n_ret > 0:
+            i_users = self.groups.list_users(group_id,limit=batch_size,offset=off*batch_size)
+            user_list.extend(i_users)
+            n_ret = i_users.__len__()
+            off += 1
+
+        return user_list
 
 
 
@@ -539,7 +581,14 @@ class Domo:
         """
             Remove a User to a Group
         """
-        return self.groups.remove_user(group_id, user_id)
+        if isinstance(user_id,list):
+            for x in user_id:
+                self.groups.remove_user(group_id, x)
+        else:
+            self.groups.remove_user(group_id, user_id)
+
+        return 'success'
+
 
 ######### Accounts #########
     def accounts_list(self):
