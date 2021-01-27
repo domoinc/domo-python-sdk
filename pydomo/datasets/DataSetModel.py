@@ -50,6 +50,7 @@ class Policy(DomoObject):
         'name',
         'filters',
         'users',
+        'virtualUsers',
         'groups'
     ]
 
