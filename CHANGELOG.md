@@ -1,5 +1,12 @@
 # PyDomo Changelog
 
+### v0.3.0.2
+January 26, 2021
+
+Updates
+* Virtual user support added to PDP policy
+* Pandas added to install.sh
+
 ### v0.3.0.1
 January 21, 2021
 
