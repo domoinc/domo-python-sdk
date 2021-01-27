@@ -7,7 +7,7 @@ long_description = 'See https://github.com/domoinc/domo-python-sdk for more deta
 
 setup(
     name='pydomo',
-    version='0.3.0.01',
+    version='0.3.0.2',
     description=description,
     long_description=long_description,
     author='Jeremy Morris',
