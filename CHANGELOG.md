@@ -1,5 +1,12 @@
 # PyDomo Changelog
 
+### v0.3.0.3
+February 9, 2021
+
+Bug Fixes
+* ds_updated and ds_create did not upload the full dataframe when doing mult-part uploads
+* pandas was not required in setup file
+
 ### v0.3.0.2
 January 26, 2021
 
