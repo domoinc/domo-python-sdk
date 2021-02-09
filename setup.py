@@ -18,6 +18,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['examples']),
     install_requires=[
+        'pandas',
         'requests',
         'requests_toolbelt',
     ],
