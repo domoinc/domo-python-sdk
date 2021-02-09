@@ -78,12 +78,14 @@ class UtilitiesClient(DomoAPIClient):
         if df_rows > chunksz:
             end = chunksz
 
-        while end <= df_rows:
+        for i in range(math.ceil(df_rows/chunksz)):
             df_sub = df_up.iloc[start:end, ]
             csv = df_sub.to_csv(header=False,index=False)
             self.stream.upload_part(stream_id, exec_id, start, csv)
             start = end
             end = end + chunksz
+            if end > df_rows:
+                end = df_rows
 
         result = self.stream.commit_execution(stream_id, exec_id)
 
