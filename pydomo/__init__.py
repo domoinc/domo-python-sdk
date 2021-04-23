@@ -215,6 +215,9 @@ class Domo:
     def ds_update(self, ds_id, df_up):
         return self.utilities.stream_upload(ds_id, df_up)
 
+    def ds_modify(self,dataset_id,changes):
+        return self.datasets.update(dataset_id,changes)
+
 ######### PDP #########
 
     def pdp_create(self, dataset_id, pdp_request):
