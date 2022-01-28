@@ -80,12 +80,14 @@ class Domo:
             self.logger = parent_logger.getChild(kwargs['logger_name'])
         else:
             self.logger = parent_logger
-
+        
+        timeout = kwargs.get('request_timeout', None)
+        
         if kwargs.get('log_level'):
             self.logger.setLevel(kwargs['log_level'])
         self.logger.debug("\n" + DOMO + "\n")
 
-        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger)
+        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger, request_timeout = timeout))
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.pages = PageClient(self.transport, self.logger)
