@@ -2,6 +2,7 @@
 import json
 import math
 import sys
+import json
 
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.datasets import DataSetClient
@@ -90,3 +91,13 @@ class UtilitiesClient(DomoAPIClient):
         result = self.stream.commit_execution(stream_id, exec_id)
 
         return result
+
+    def stream_create(self, up_ds, name, description, updateMethod='REPLACE', keyColumnNames=''):
+        df_schema = self.data_schema(up_ds)
+        req_body = {'dataSet': {'name': name, 'description': description, 'schema': {'columns': df_schema}}, 'updateMethod': updateMethod}
+        if( updateMethod == 'UPSERT' ):
+            req_body['keyColumnNames'] = keyColumnNames
+        # return req_body
+        st_created = self.transport.post('/v1/streams/', req_body, {})
+        return(st_created)
+        return json.loads(st_created.content.decode('utf-8'))['dataSet']['id']

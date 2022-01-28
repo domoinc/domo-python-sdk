@@ -16,6 +16,7 @@ from pandas import DataFrame
 from pandas import to_datetime
 from io import StringIO
 import logging
+import json
 
 DOMO = """####################################################################################################
 ####################################################################################################
@@ -195,21 +196,16 @@ class Domo:
                     df[col] = to_datetime(df[col])
                 except ValueError:
                     pass
+                except TypeError:
+                    pass
 
         return df
 
-    def ds_create(self, df_up, name, description=''):
-        dsr = DataSetRequest()
-        dsr.name = name
-        dsr.description = description
-        dsr.schema = Schema([Column(ColumnType.STRING, 'tt1'),
-                             Column(ColumnType.STRING, 'tt2')])
-
-        new_ds_info = self.datasets.create(dsr)
-
-        self.utilities.stream_upload(new_ds_info['id'],df_up,warn_schema_change=False)
-
-        return new_ds_info['id']
+    def ds_create(self, df_up, name, description='', update_method='REPLACE', key_column_names=''):
+        new_stream = self.utilities.stream_create(df_up, name, description, update_method, key_column_names)
+        ds_id = json.loads(new_stream.content.decode('utf-8'))['dataSet']['id']
+        self.utilities.stream_upload(ds_id,df_up,warn_schema_change=False)
+        return ds_id
 
 
     def ds_update(self, ds_id, df_up):
