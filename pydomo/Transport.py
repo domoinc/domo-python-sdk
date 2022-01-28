@@ -13,12 +13,13 @@ class DomoAPITransport:
     serialization and deserialization of objects.
     """
 
-    def __init__(self, client_id, client_secret, api_host, use_https, logger):
+    def __init__(self, client_id, client_secret, api_host, use_https, logger, request_timeout):
         self.apiHost = self._build_apihost(api_host, use_https)
         self.clientId = client_id
         self.clientSecret = client_secret
         self.logger = logger
         self._renew_access_token()
+        self.request_timeout = request_timeout
 
     @staticmethod
     def _build_apihost(host, use_https):
@@ -68,7 +69,8 @@ class DomoAPITransport:
         self.logger.debug('{} {} {}'.format(method, url, body))
         request_args = {'method': method, 'url': url, 'headers': headers,
                         'params': params, 'data': body, 'stream': True}
-
+        if self.request_timeout:
+            request_args['timeout'] = self.request_timeout
         response = requests.request(**request_args)
         if response.status_code == requests.codes.UNAUTHORIZED:
             self._renew_access_token()

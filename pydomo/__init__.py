@@ -81,11 +81,13 @@ class Domo:
         else:
             self.logger = parent_logger
 
+        timeout = kwargs.get('request_timeout', None)
+
         if kwargs.get('log_level'):
             self.logger.setLevel(kwargs['log_level'])
         self.logger.debug("\n" + DOMO + "\n")
 
-        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger)
+        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger, request_timeout = timeout)
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.pages = PageClient(self.transport, self.logger)
@@ -137,7 +139,7 @@ class Domo:
             - `per_page`:   results per page. Default 50 (int)
             - `offset`:     offset if you need to paginate results. Default 0 (int)
             - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
-            
+
             :Returns:
             list or pandas dataframe depending on parameters
 
@@ -148,7 +150,7 @@ class Domo:
         else:
             out = DataFrame(list(l))
         return out
-    
+
     def ds_query(self, dataset_id, query, return_data=True):
         """
             Evaluate query and return dataset in a dataframe
@@ -161,7 +163,7 @@ class Domo:
             - `dataset_id`:     id of a dataset (str)
             - `query`:          query object (dict)
             - `return_data`:    should the result be a dataframe. Default True (Boolean)
-            
+
             :Returns:
             dict or pandas dataframe depending on parameters
         """
@@ -180,10 +182,10 @@ class Domo:
 
             :Parameters:
             - `dataset_id`:     id of a dataset (str)
-            
+
             :Returns:
             pandas dataframe
-        """    
+        """
         csv_download = self.datasets.data_export(dataset_id, include_csv_header=True)
 
         content = StringIO(csv_download)
@@ -232,14 +234,14 @@ class Domo:
         ,   "not": false } ], "users": [ 27 ],"groups": [ ]}
 
         :Parameters:
-          - `dataset_id`:   id of the dataset PDP will be applied to (String) Required 
+          - `dataset_id`:   id of the dataset PDP will be applied to (String) Required
           Policy Object:
           - `name`: Name of the Policy (String) Required
-          - `filters[].column`:	Name of the column to filter on (String) Required 
+          - `filters[].column`:	Name of the column to filter on (String) Required
           - `filters[].not`: Determines if NOT is applied to the filter operation (Boolean) Required
-          - `filters[].operator`: Matching operator (EQUALS) (String) Required 
-          - `filters[].values[]`: Values to filter on (String) Required 
-          - `type`: Type of policy (user or system) (String) Required 
+          - `filters[].operator`: Matching operator (EQUALS) (String) Required
+          - `filters[].values[]`: Values to filter on (String) Required
+          - `type`: Type of policy (user or system) (String) Required
           - `users`: List of user IDs the policy applies to (array) Required
           - `groups`: List of group IDs the policy applies to (array) Required
         """
@@ -252,7 +254,7 @@ class Domo:
         >>> domo.pdp_delete('4405ff58-1957-45f0-82bd-914d989a3ea3', 35)
 
         :Parameters:
-        - `dataset_id`: id of the dataset PDP will be applied to (String) Required 
+        - `dataset_id`: id of the dataset PDP will be applied to (String) Required
         - `policy_id`:  id of the policy to delete (String) Required
         """
         return self.datasets.delete_pdp(dataset_id, policy_id)
@@ -267,7 +269,7 @@ class Domo:
             :Parameters:
             - `dataset_id`:   id of dataset with PDP policies (str) Required
             - `df_output`:  should the result be a dataframe. Default True (Boolean)
-            
+
             :Returns:
             list or pandas dataframe depending on parameters
 
@@ -297,15 +299,15 @@ class Domo:
         ,   "not": false } ], "users": [ 27 ],"groups": [ ]}
 
         :Parameters:
-          - `dataset_id`:   id of the dataset PDP will be applied to (String) Required 
-          - `policy_id`:    id of the PDP pollicy that will be updated (String) Required 
+          - `dataset_id`:   id of the dataset PDP will be applied to (String) Required
+          - `policy_id`:    id of the PDP pollicy that will be updated (String) Required
           Policy Object:
           - `name`: Name of the Policy (String) Required
-          - `filters[].column`:	Name of the column to filter on (String) Required 
+          - `filters[].column`:	Name of the column to filter on (String) Required
           - `filters[].not`: Determines if NOT is applied to the filter operation (Boolean) Required
-          - `filters[].operator`: Matching operator (EQUALS) (String) Required 
-          - `filters[].values[]`: Values to filter on (String) Required 
-          - `type`: Type of policy (user or system) (String) Required 
+          - `filters[].operator`: Matching operator (EQUALS) (String) Required
+          - `filters[].values[]`: Values to filter on (String) Required
+          - `type`: Type of policy (user or system) (String) Required
           - `users`: List of user IDs the policy applies to (array) Required
           - `groups`: List of group IDs the policy applies to (array) Required
         """
@@ -600,7 +602,7 @@ class Domo:
         - `per_page`:   results per page. Default 50 (int)
         - `offset`:     offset if you need to paginate results. Default 0 (int)
         - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
-            
+
 
         :returns:
           - A list of dicts (with nesting possible)
