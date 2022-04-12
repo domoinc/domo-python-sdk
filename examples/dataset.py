@@ -36,8 +36,8 @@ def datasets(domo):
     update.schema = Schema([Column(ColumnType.STRING, 'Friend'),
                             Column(ColumnType.STRING, 'Attending')])
     update.owner = {
-                      "id" : 28,
-                      "name" : "Carl Friedrich Gauss"
+                      "id":28,
+                      "name":"Carl Friedrich Gauss"
                    }
 
     updated_dataset = datasets.update(dataset['id'], update)
