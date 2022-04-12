@@ -35,6 +35,11 @@ def datasets(domo):
     update.description = 'Mathematician Guest List - Update'
     update.schema = Schema([Column(ColumnType.STRING, 'Friend'),
                             Column(ColumnType.STRING, 'Attending')])
+    update.owner = {
+                      "id" : 28,
+                      "name" : "Carl Friedrich Gauss"
+                   }
+
     updated_dataset = datasets.update(dataset['id'], update)
     domo.logger.info("Updated DataSet {}: {}".format(updated_dataset['id'],
                                                      updated_dataset['name']))

@@ -5,7 +5,7 @@ class Column(DomoObject):
     accepted_attrs = [
         'type',
         'name'
-    ]
+        ]
 
     def __init__(self, column_type, name):
         super().__init__()
@@ -26,7 +26,8 @@ class DataSetRequest(DomoObject):
     accepted_attrs = [
         'name',
         'description',
-        'schema'
+        'schema',
+        'owner'
     ]
 
 
