@@ -200,6 +200,8 @@ class Domo:
                     pass
                 except TypeError:
                     pass
+                except OverflowError:
+                    pass
 
         return df
 
