@@ -110,7 +110,6 @@ The functions in this package match most parts of the API documented at [develop
 	* **ds_list** - downloads a list of data sets in your Domo instance
 	* **ds_delete** - deletes a data set (be careful)
 	* **ds_query** - allows you to send a query to a data set, Domo will evaluate that query and sends the results back as a list or a tibble
-	* **ds_rename** - renames an existing data set
 * **Groups** - This set of functions modifies and creates groups.
 	* **groups_add_users** - adds users to an existing group
 	* **groups_create** - create a group
