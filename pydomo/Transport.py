@@ -100,7 +100,8 @@ class DomoAPITransport:
         payload_bytes = bytes(token_parts[1], 'utf-8')
         # Padding required for the base64 library
         decoded_payload_bytes = base64.urlsafe_b64decode(payload_bytes + b'==')
-        decoded_payload_dict = json.loads(decoded_payload_bytes.decode('utf-8'))
+        payload_string = decoded_payload_bytes.decode('utf-8')
+        decoded_payload_dict = json.loads(payload_string)
         if EXPIRATION_DATE_KEY in decoded_payload_dict.keys():
             expiration_date = decoded_payload_dict[EXPIRATION_DATE_KEY]
             self.logger.debug('Token expiration: {}'.format(expiration_date))
