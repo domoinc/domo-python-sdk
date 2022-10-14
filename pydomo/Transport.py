@@ -1,8 +1,10 @@
 import requests
 import json
+import base64
 from collections import namedtuple
 from requests.auth import HTTPBasicAuth
 from requests_toolbelt.utils import dump
+from datetime import datetime, timezone
 
 
 class DomoAPITransport:
@@ -71,12 +73,14 @@ class DomoAPITransport:
                         'params': params, 'data': body, 'stream': True}
         if self.request_timeout:
             request_args['timeout'] = self.request_timeout
-        response = requests.request(**request_args)
-        if response.status_code == requests.codes.UNAUTHORIZED:
+
+        # Expiration date should be in UTC
+        if datetime.now(timezone.utc).timestamp() > self.token_expiration:
+            self.logger.debug("Access token is expired")
             self._renew_access_token()
             headers['Authorization'] = 'bearer ' + self.access_token
-            response = requests.request(**request_args)
-        return response
+
+        return requests.request(**request_args)
 
     def _renew_access_token(self):
         self.logger.debug("Renewing Access Token")
@@ -84,9 +88,36 @@ class DomoAPITransport:
         response = requests.post(url=url, auth=HTTPBasicAuth(self.clientId, self.clientSecret))
         if response.status_code == requests.codes.OK:
             self.access_token = response.json()['access_token']
+            self.token_expiration = self._extract_expiration(self.access_token)
         else:
             self.logger.debug('Error retrieving access token: ' + self.dump_response(response))
             raise Exception("Error retrieving a Domo API Access Token: " + response.text)
+
+    def _extract_expiration(self, access_token):
+        expiration_date = 0
+        try:
+            decoded_payload_dict = self._decode_payload(access_token)
+
+            if 'exp' in decoded_payload_dict.keys():
+                expiration_date = decoded_payload_dict['exp']
+                self.logger.debug('Token expiration: {}'
+                                  .format(expiration_date))
+        except Exception as err:
+            # If an Exception is raised, log and continue. expiration_date will
+            # either be 0 or set to the value in the JWT.
+            self.logger.debug('Ran into error parsing token for expiration. '
+                              'Setting expiration date to 0. '
+                              '{}: {}'.format(type(err).__name__, err))
+        return expiration_date
+
+    def _decode_payload(self, access_token):
+        token_parts = access_token.split('.')
+
+        # Padding required for the base64 library
+        payload_bytes = bytes(token_parts[1], 'utf-8') + b'=='
+        decoded_payload_bytes = base64.urlsafe_b64decode(payload_bytes)
+        payload_string = decoded_payload_bytes.decode('utf-8')
+        return json.loads(payload_string)
 
     def dump_response(self, response):
         data = dump.dump_all(response)
