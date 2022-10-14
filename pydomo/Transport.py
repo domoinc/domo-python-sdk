@@ -96,17 +96,12 @@ class DomoAPITransport:
     def _extract_expiration(self, access_token):
         expiration_date = 0
         try:
-            token_parts = access_token.split('.')
-            payload_bytes = bytes(token_parts[1], 'utf-8')
-
-            # Padding required for the base64 library
-            decoded_payload_bytes = base64.urlsafe_b64decode(payload_bytes + b'==')
-            payload_string = decoded_payload_bytes.decode('utf-8')
-            decoded_payload_dict = json.loads(payload_string)
+            decoded_payload_dict = self._decode_payload(access_token)
 
             if 'exp' in decoded_payload_dict.keys():
                 expiration_date = decoded_payload_dict['exp']
-                self.logger.debug('Token expiration: {}'.format(expiration_date))
+                self.logger.debug('Token expiration: {}'
+                                  .format(expiration_date))
         except Exception as err:
             # If an Exception is raised, log and continue. expiration_date will
             # either be 0 or set to the value in the JWT.
@@ -114,6 +109,15 @@ class DomoAPITransport:
                               'Setting expiration date to 0. '
                               '{}: {}'.format(type(err).__name__, err))
         return expiration_date
+
+    def _decode_payload(self, access_token):
+        token_parts = access_token.split('.')
+
+        # Padding required for the base64 library
+        payload_bytes = bytes(token_parts[1], 'utf-8') + b'=='
+        decoded_payload_bytes = base64.urlsafe_b64decode(payload_bytes)
+        payload_string = decoded_payload_bytes.decode('utf-8')
+        return json.loads(payload_string)
 
     def dump_response(self, response):
         data = dump.dump_all(response)
