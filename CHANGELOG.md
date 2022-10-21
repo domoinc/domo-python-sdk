@@ -1,5 +1,11 @@
 # PyDomo Changelog
 
+### v0.3.0.6
+October 21, 2022
+
+Bug Fixes
+* Now checks for invalid token before sending requests. If the token is invalid, the SDK now refreshes it automatically.
+
 ### v0.3.0.3
 February 9, 2021
 
