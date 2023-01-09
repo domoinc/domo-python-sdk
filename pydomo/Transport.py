@@ -20,8 +20,8 @@ class DomoAPITransport:
         self.clientId = client_id
         self.clientSecret = client_secret
         self.logger = logger
-        self._renew_access_token()
         self.request_timeout = request_timeout
+        self._renew_access_token()
 
     @staticmethod
     def _build_apihost(host, use_https):
@@ -84,8 +84,15 @@ class DomoAPITransport:
 
     def _renew_access_token(self):
         self.logger.debug("Renewing Access Token")
-        url = self.apiHost + '/oauth/token?grant_type=client_credentials'
-        response = requests.post(url=url, auth=HTTPBasicAuth(self.clientId, self.clientSecret))
+        request_args = {
+            'method': HTTPMethod.POST,
+            'url': self.apiHost + '/oauth/token?grant_type=client_credentials',
+            'auth': HTTPBasicAuth(self.clientId, self.clientSecret)
+        }
+        if self.request_timeout:
+            request_args['timeout'] = self.request_timeout
+
+        response = requests.request(**request_args)
         if response.status_code == requests.codes.OK:
             self.access_token = response.json()['access_token']
             self.token_expiration = self._extract_expiration(self.access_token)
