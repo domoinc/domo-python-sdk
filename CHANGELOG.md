@@ -1,5 +1,15 @@
 # PyDomo Changelog
 
+### v0.3.0.8
+March 16, 2023
+
+* Fix upsert upload through the ds_create method by using a list of key_column_names rather than a string
+
+### v0.3.0.7
+January 9, 2023
+
+* Use request_timeout when renewing access token
+
 ### v0.3.0.6
 October 21, 2022
 
