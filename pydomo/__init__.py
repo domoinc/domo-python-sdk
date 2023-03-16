@@ -203,12 +203,21 @@ class Domo:
 
         return df
 
-    def ds_create(self, df_up, name, description='', update_method='REPLACE', key_column_names=''):
-        new_stream = self.utilities.stream_create(df_up, name, description, update_method, key_column_names)
-        ds_id = json.loads(new_stream.content.decode('utf-8'))['dataSet']['id']
-        self.utilities.stream_upload(ds_id,df_up,warn_schema_change=False)
-        return ds_id
-
+    def ds_create(self, df_up, name, description='',
+                  update_method='REPLACE', key_column_names=[]):
+        new_stream = self.utilities.stream_create(df_up,
+                                                  name,
+                                                  description,
+                                                  update_method,
+                                                  key_column_names)
+        if "dataSet" in new_stream:
+            ds_id = new_stream['dataSet']['id']
+            self.utilities.stream_upload(ds_id, df_up,
+                                         warn_schema_change=False)
+            return ds_id
+        else:
+            raise Exception(("Stream creation didn't work as expected. "
+                             "Response: {}").format(new_stream))
 
     def ds_update(self, ds_id, df_up):
         return self.utilities.stream_upload(ds_id, df_up)
