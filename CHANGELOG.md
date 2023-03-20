@@ -1,5 +1,11 @@
 # PyDomo Changelog
 
+### v0.3.0.9
+March 20, 2023
+
+Updates
+* Include the name_like parameter for the ds_list method to allow filtering on datasource name
+
 ### v0.3.0.8
 March 16, 2023
 
