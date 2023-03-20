@@ -127,7 +127,7 @@ class Domo:
 
         return out
 
-    def ds_list(self, df_output = True, per_page=50, offset=0, limit=0):
+    def ds_list(self, df_output = True, per_page=50, offset=0, limit=0, name_like=""):
         """
             List DataSets
 
@@ -144,11 +144,14 @@ class Domo:
             list or pandas dataframe depending on parameters
 
         """
-        l = self.datasets.list()
+        datasources = self.datasets.list(per_page=per_page,
+                                         offset=offset,
+                                         limit=limit,
+                                         name_like=name_like)
         if df_output == False:
-            out = list(l)
+            out = list(datasources)
         else:
-            out = DataFrame(list(l))
+            out = DataFrame(list(datasources))
         return out
 
     def ds_query(self, dataset_id, query, return_data=True):
