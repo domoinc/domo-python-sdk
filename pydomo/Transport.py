@@ -77,7 +77,7 @@ class DomoAPITransport:
             request_args['timeout'] = self.request_timeout
         if self.proxies:
             request_args['proxies'] = self.proxies
-        if self.verify:
+        if self.verify is not None:
             request_args['verify'] = self.verify
         # Expiration date should be in UTC
         if datetime.now(timezone.utc).timestamp() > self.token_expiration:
@@ -96,6 +96,10 @@ class DomoAPITransport:
         }
         if self.request_timeout:
             request_args['timeout'] = self.request_timeout
+        if self.proxies:
+            request_args['proxies'] = self.proxies
+        if self.verify is not None:
+            request_args['verify'] = self.verify
 
         response = requests.request(**request_args)
         if response.status_code == requests.codes.OK:
