@@ -15,12 +15,14 @@ class DomoAPITransport:
     serialization and deserialization of objects.
     """
 
-    def __init__(self, client_id, client_secret, api_host, use_https, logger, request_timeout):
+    def __init__(self, client_id, client_secret, api_host, use_https, logger, request_timeout, proxies, verify):
         self.apiHost = self._build_apihost(api_host, use_https)
         self.clientId = client_id
         self.clientSecret = client_secret
         self.logger = logger
         self.request_timeout = request_timeout
+        self.proxies = proxies
+        self.verify = verify
         self._renew_access_token()
 
     @staticmethod
@@ -73,7 +75,10 @@ class DomoAPITransport:
                         'params': params, 'data': body, 'stream': True}
         if self.request_timeout:
             request_args['timeout'] = self.request_timeout
-
+        if self.proxies:
+            request_args['proxies'] = self.proxies
+        if self.verify:
+            request_args['verify'] = self.verify
         # Expiration date should be in UTC
         if datetime.now(timezone.utc).timestamp() > self.token_expiration:
             self.logger.debug("Access token is expired")
