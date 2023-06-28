@@ -21,7 +21,8 @@ class DomoAPIClient(object):
         else:
             self.logger.debug("Error creating " + obj_desc + ": "
                               + self.transport.dump_response(response))
-            raise Exception("Error creating " + obj_desc + ": " + response.text)
+            raise Exception("Error creating " + obj_desc + ": "
+                            + response.text)
 
     def _get(self, url, obj_desc):
         response = self.transport.get(url=url, params={})
