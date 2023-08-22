@@ -80,7 +80,7 @@ class UtilitiesClient(DomoAPIClient):
             end = chunksz
 
         for i in range(math.ceil(df_rows/chunksz)):
-            df_sub = df_up.iloc[start:end, ]
+            df_sub = df_up.iloc[start:end]
             csv = df_sub.to_csv(header=False,index=False)
             self.stream.upload_part(stream_id, exec_id, start, csv)
             start = end
