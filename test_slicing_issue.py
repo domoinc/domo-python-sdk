@@ -19,7 +19,7 @@ DOMO_CLIENT_ID = os.getenv('DOMO_CLIENT_ID')
 DOMO_CLIENT_SECRET = os.getenv('DOMO_CLIENT_SECRET')
 DOMO_API_HOST = 'api.domo.com'
 
-def stream_upload_new(self, ds_id, df_up, warn_schema_change=True):
+def stream_upload_old(self, ds_id, df_up, warn_schema_change=True):
     domoSchema = self.domo_schema(ds_id)
     dataSchema = self.data_schema(df_up)
 
@@ -43,7 +43,7 @@ def stream_upload_new(self, ds_id, df_up, warn_schema_change=True):
         end = chunksz
 
     for i in range(math.ceil(df_rows / chunksz)):
-        df_sub = df_up.iloc[start:end]  # Removed the comma here
+        df_sub = df_up.iloc[start:end, ]  # Removed the comma here in the PR
         csv = df_sub.to_csv(header=False, index=False)
         self.stream.upload_part(stream_id, exec_id, start, csv)
         start = end
@@ -55,7 +55,7 @@ def stream_upload_new(self, ds_id, df_up, warn_schema_change=True):
     return result
 
 # Patch the UtilitiesClient class stream_upload method
-UtilitiesClient.stream_upload_new = stream_upload_new
+UtilitiesClient.stream_upload_old = stream_upload_old
 
 class TestSlicingIssue(unittest.TestCase):
     
@@ -88,6 +88,7 @@ class TestSlicingIssue(unittest.TestCase):
     def test_slicing_issue_old_method(self):
         print("Testing with current stream_upload method...")
         try:
+            self.domo.utilities.stream_upload = self.domo.utilities.stream_upload_old
             dataset_old = self.domo.ds_create(self.df,'TEST_SLICING_ISSUE_OLD', 'Test dataset for slicing issue in PyDomo SDK (old method)')
             self.domo.ds_update(dataset_old, self.df)
             print("Old method succeeded.")
@@ -97,7 +98,6 @@ class TestSlicingIssue(unittest.TestCase):
     def test_slicing_issue_new_method(self):
         print("Testing revised stream_upload method...")
         try:
-            self.domo.utilities.stream_upload = self.domo.utilities.stream_upload_new
             dataset_new = self.domo.ds_create(self.df,'TEST_SLICING_ISSUE_NEW', 'Test dataset for slicing issue in PyDomo SDK (new method)')
             self.domo.ds_update(dataset_new, self.df)
             print("New method succeeded.")
