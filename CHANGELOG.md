@@ -1,5 +1,11 @@
 # PyDomo Changelog
 
+### v0.3.0.10
+September 20, 2023
+
+Bug Fixes
+* Remove an errant comma in the dataframe paging logic in ds_create and ds_update
+
 ### v0.3.0.9
 March 20, 2023
 
