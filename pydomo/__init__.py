@@ -82,12 +82,14 @@ class Domo:
             self.logger = parent_logger
 
         timeout = kwargs.get('request_timeout', None)
+        proxies = kwargs.get('proxies', None)
+        verify = kwargs.get('verify', True)
 
         if kwargs.get('log_level'):
             self.logger.setLevel(kwargs['log_level'])
         self.logger.debug("\n" + DOMO + "\n")
 
-        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger, request_timeout = timeout)
+        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger, request_timeout = timeout, proxies = proxies, verify = verify)
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.pages = PageClient(self.transport, self.logger)
@@ -112,7 +114,7 @@ class Domo:
     def ds_delete(self, dataset_id, prompt_before_delete=True):
         """
             Delete a DataSet naming convention equivalent with rdomo
-            
+
             :Parameters:
             - `dataset_id`: id of a dataset (str)
         """
