@@ -86,7 +86,8 @@ class DomoAPITransport:
         self.logger.debug("Renewing Access Token")
         request_args = {
             'method': HTTPMethod.POST,
-            'url': self.apiHost + '/oauth/token?grant_type=client_credentials',
+            'url': self.apiHost + '/oauth/token',
+            'data': {'grant_type': 'client_credentials'},
             'auth': HTTPBasicAuth(self.clientId, self.clientSecret)
         }
         if self.request_timeout:
