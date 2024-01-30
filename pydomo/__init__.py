@@ -17,6 +17,7 @@ from pandas import to_datetime
 from io import StringIO
 import logging
 import json
+import csv
 
 DOMO = """####################################################################################################
 ####################################################################################################
@@ -205,6 +206,12 @@ class Domo:
                     pass
 
         return df
+    
+    def ds_get_dict(self,ds_id):
+        my_data = self.datasets.data_export(ds_id,True)
+        dr = csv.DictReader(StringIO(my_data))
+        data_list = list(dr)
+        return(data_list)
 
     def ds_create(self, df_up, name, description='',
                   update_method='REPLACE', key_column_names=[]):
