@@ -1,5 +1,12 @@
 # PyDomo Changelog
 
+### v0.3.0.11
+January 31, 2024
+
+Updates
+* Modify the authentication process to conform to new API functionality.
+* Add ds_get_dict - this function exports a data set from Domo and returns a list of dictionaries. The list contains one dictionary for each row in Domo.
+
 ### v0.3.0.10
 September 20, 2023
 
