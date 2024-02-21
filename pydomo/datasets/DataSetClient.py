@@ -1,5 +1,8 @@
 import os
 import requests
+from pandas import read_csv
+from pandas import DataFrame
+from io import StringIO
 
 from pydomo.datasets import Sorting, UpdateMethod
 from pydomo.DomoAPIClient import DomoAPIClient
@@ -41,7 +44,8 @@ class DataSetClient(DomoAPIClient):
         Returns a generator that will call the API multiple times
         If limit is supplied and non-zero, returns up to limit datasets
     """
-    def list(self, sort=Sorting.DEFAULT, per_page=50, offset=0, limit=0):
+    def list(self, sort=Sorting.DEFAULT, per_page=50,
+             offset=0, limit=0, name_like=""):
         # API uses pagination with a max of 50 per page
         if per_page not in range(1, 51):
             raise ValueError('per_page must be between 1 and 50 (inclusive)')
@@ -54,6 +58,7 @@ class DataSetClient(DomoAPIClient):
             'sort': sort,
             'limit': per_page,
             'offset': offset,
+            'nameLike': name_like
         }
         dataset_count = 0
 
@@ -187,3 +192,12 @@ class DataSetClient(DomoAPIClient):
         url = '{base}/{dataset_id}/policies/{policy_id}'.format(
                 base=URL_BASE, dataset_id=dataset_id, policy_id=policy_id)
         return self._delete(url, PDP_DESC)
+    
+    """
+        Query's Dataset
+    """
+    def query(self, dataset_id, query):
+        url = '{base}/query/execute/{dataset_id}'.format(
+                base=URL_BASE, dataset_id=dataset_id)
+        req_body = {'sql':query}
+        return self._create(url, req_body, {}, 'query')

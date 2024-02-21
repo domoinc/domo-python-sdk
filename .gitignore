@@ -14,3 +14,6 @@ pydomo/roles/__pycache__
 pydomo/tests/__pycache__
 publishPypiLive.sh
 publishPypiTest.sh
+.idea/
+build/
+pydomo.egg-info/

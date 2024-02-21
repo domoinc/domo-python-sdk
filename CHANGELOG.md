@@ -1,5 +1,81 @@
 # PyDomo Changelog
 
+### v0.3.0.11
+January 31, 2024
+
+Updates
+* Modify the authentication process to conform to new API functionality.
+* Add ds_get_dict - this function exports a data set from Domo and returns a list of dictionaries. The list contains one dictionary for each row in Domo.
+
+### v0.3.0.10
+September 20, 2023
+
+Bug Fixes
+* Remove an errant comma in the dataframe paging logic in ds_create and ds_update
+
+### v0.3.0.9
+March 20, 2023
+
+Updates
+* Include the name_like parameter for the ds_list method to allow filtering on datasource name
+
+### v0.3.0.8
+March 16, 2023
+
+* Fix upsert upload through the ds_create method by using a list of key_column_names rather than a string
+
+### v0.3.0.7
+January 9, 2023
+
+* Use request_timeout when renewing access token
+
+### v0.3.0.6
+October 21, 2022
+
+Bug Fixes
+* Now checks for invalid token before sending requests. If the token is invalid, the SDK now refreshes it automatically.
+
+### v0.3.0.3
+February 9, 2021
+
+Bug Fixes
+* ds_updated and ds_create did not upload the full dataframe when doing mult-part uploads
+* pandas was not required in setup file
+
+### v0.3.0.2
+January 26, 2021
+
+Updates
+* Virtual user support added to PDP policy
+* Pandas added to install.sh
+
+### v0.3.0.1
+January 21, 2021
+
+Bug Fixes
+* ds_query fixed to accept a data set id and a SQL query
+* ds_delete now requires confirmation before deleting a data set
+    * use prompt_before_delete=False to force delete
+* group functions modified to match rdomo, prior to this release these functions did not work correctly
+    * groups_add_users now adds multiple users at a time
+    * groups_create now takes a group name and a list of users
+    * groups_list now pages through all lists automatically
+    * groups_list_users now pages through all users automatically
+    * groups_remove_users now removes a list of users
+    * groups_delete now removes all users from the group and then deletes the group 
+
+### v0.3.0
+January 8, 2021
+
+The primary objective of this release is to make it easier to interact with Domo via Python and to sync functionality with the R SDK. The following changes have been made.
+* Methods were added to the primary object so that the sub-objects don't need to be used.
+* Method names sync'd with functions from the R SDK
+* Method names follow a specific naming convention for ease of use
+* Methods to download data from Domo now return a Pandas dataframe
+* Methods to upload data to Domo now take a Pandas dataframe as an input
+* Uploading data is now easier as interactions with the streams API are abstracted
+* All methods prior to these updates are unchanged, existing code should continue to work w/o issue
+
 ### v0.2.3
 - Apr 18, 2019
 - Added GZIP support for Streams (Thank you @ldacey!)
