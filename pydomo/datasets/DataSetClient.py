@@ -145,6 +145,14 @@ class DataSetClient(DomoAPIClient):
         return self._delete(url, DATA_SET_DESC)
 
     """
+        Query a DataSet
+    """
+    def query(self, dataset_id, dataset_query):
+        url = '{base}/query/execute/{dataset_id}'.format(
+                base=URL_BASE, dataset_id=dataset_id)
+        return self._query(url, dataset_query, {}, DATA_SET_DESC)
+
+    """
         Create a Personalized Data Policy (PDP)
     """
     def create_pdp(self, dataset_id, pdp_request):
