@@ -15,12 +15,13 @@ class DomoAPITransport:
     serialization and deserialization of objects.
     """
 
-    def __init__(self, client_id, client_secret, api_host, use_https, logger, request_timeout):
+    def __init__(self, client_id, client_secret, api_host, use_https, logger, request_timeout, scope):
         self.apiHost = self._build_apihost(api_host, use_https)
         self.clientId = client_id
         self.clientSecret = client_secret
         self.logger = logger
         self.request_timeout = request_timeout
+        self.scope = scope
         self._renew_access_token()
 
     @staticmethod
@@ -84,10 +85,13 @@ class DomoAPITransport:
 
     def _renew_access_token(self):
         self.logger.debug("Renewing Access Token")
+        # scope == None means use all scopes from client
+        scope = ' '.join(self.scope) if self.scope else None
+
         request_args = {
             'method': HTTPMethod.POST,
             'url': self.apiHost + '/oauth/token',
-            'data': {'grant_type': 'client_credentials'},
+            'data': {'grant_type': 'client_credentials', 'scope': scope},
             'auth': HTTPBasicAuth(self.clientId, self.clientSecret)
         }
         if self.request_timeout:
