@@ -114,7 +114,7 @@ class Domo:
     def ds_delete(self, dataset_id, prompt_before_delete=True):
         """
             Delete a DataSet naming convention equivalent with rdomo
-            
+
             :Parameters:
             - `dataset_id`: id of a dataset (str)
         """
@@ -178,7 +178,7 @@ class Domo:
         return output
 
 
-    def ds_get(self, dataset_id):
+    def ds_get(self, dataset_id, **kwargs):
         """
             Export data to pandas Dataframe
 
@@ -187,6 +187,8 @@ class Domo:
 
             :Parameters:
             - `dataset_id`:     id of a dataset (str)
+            - `**kwargs`:       additional keyword arguments to be passed to read_csv
+
 
             :Returns:
             pandas dataframe
@@ -194,7 +196,7 @@ class Domo:
         csv_download = self.datasets.data_export(dataset_id, include_csv_header=True)
 
         content = StringIO(csv_download)
-        df = read_csv(content)
+        df = read_csv(content, **kwargs)
 
         # Convert to dates or datetimes if possible
         for col in df.columns:
