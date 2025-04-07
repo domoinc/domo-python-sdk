@@ -178,7 +178,7 @@ class Domo:
         return output
 
 
-    def ds_get(self, dataset_id):
+    def ds_get(self, dataset_id, use_schema=True) -> DataFrame:
         """
             Export data to pandas Dataframe
 
@@ -187,24 +187,76 @@ class Domo:
 
             :Parameters:
             - `dataset_id`:     id of a dataset (str)
-
+            - `use_schema`: whether to use the dataset schema to determine column types (bool, default True) via type_mapping
             :Returns:
             pandas dataframe
         """
         csv_download = self.datasets.data_export(dataset_id, include_csv_header=True)
-
         content = StringIO(csv_download)
-        df = read_csv(content)
 
-        # Convert to dates or datetimes if possible
-        for col in df.columns:
-            if df[col].dtype == 'object':
-                try:
-                    df[col] = to_datetime(df[col])
-                except ValueError:
-                    pass
-                except TypeError:
-                    pass
+        if use_schema:
+            try:
+                schema_dict = self.ds_meta(dataset_id)
+
+                if "schema" in schema_dict and "columns" in schema_dict["schema"]:
+                    # type mapping can be adjusted accordingly
+                    # there is no Date type in Pandas and Timestamps are not a type in Domo
+                    type_mapping = {
+                        "LONG": "Int64",
+                        "INTEGER": "Int64",
+                        "DECIMAL": "Float64",
+                        "DOUBLE": "Float64",
+                        "DATETIME": "datetime64[ns]",
+                        "DATE": "datetime64[ns]",
+                    }
+
+                    dtype_dict = {}
+                    date_columns = []
+
+                    for column in schema_dict["schema"]["columns"]:
+                        col_name = column["name"]
+                        col_type = column["type"]
+
+                        dtype_dict[col_name] = type_mapping.get(col_type, "object")
+
+                    if col_type in ("DATE", "DATETIME"):
+                        date_columns.append(col_name)
+
+                    if date_columns:
+                        df = read_csv(
+                            content, dtype=dtype_dict, parse_dates=date_columns
+                        )
+                    else:
+                        df = read_csv(content, dtype=dtype_dict)
+
+            except Exception:
+                # attempt to fallback to original behavior
+                content.seek(0)
+                df = read_csv(content)
+
+                # Convert to dates or datetimes if possible
+                for col in df.columns:
+                    if df[col].dtype == "object":
+                        try:
+                            df[col] = to_datetime(df[col])
+                        except ValueError:
+                            pass
+                        except TypeError:
+                            pass
+
+        else:
+            # default to original behavior
+            df = read_csv(content)
+
+            # Convert to dates or datetimes if possible
+            for col in df.columns:
+                if df[col].dtype == "object":
+                    try:
+                        df[col] = to_datetime(df[col])
+                    except ValueError:
+                        pass
+                    except TypeError:
+                        pass
 
         return df
     
