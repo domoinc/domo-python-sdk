@@ -71,25 +71,33 @@ DOMO = """######################################################################
 ####################################################################################################
 ####################################################################################################"""
 
-parent_logger = logging.getLogger('pydomo')
+parent_logger = logging.getLogger("pydomo")
 parent_logger.setLevel(logging.WARNING)
 
 
 class Domo:
-    def __init__(self, client_id, client_secret, api_host='api.domo.com', **kwargs):
-        if 'logger_name' in kwargs:
-            self.logger = parent_logger.getChild(kwargs['logger_name'])
+    def __init__(self, client_id, client_secret, api_host="api.domo.com", **kwargs):
+        if "logger_name" in kwargs:
+            self.logger = parent_logger.getChild(kwargs["logger_name"])
         else:
             self.logger = parent_logger
 
-        timeout = kwargs.get('request_timeout', None)
-        scope = kwargs.get('scope')
+        timeout = kwargs.get("request_timeout", None)
+        scope = kwargs.get("scope")
 
-        if kwargs.get('log_level'):
-            self.logger.setLevel(kwargs['log_level'])
+        if kwargs.get("log_level"):
+            self.logger.setLevel(kwargs["log_level"])
         self.logger.debug("\n" + DOMO + "\n")
 
-        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger, request_timeout = timeout, scope = scope)
+        self.transport = DomoAPITransport(
+            client_id,
+            client_secret,
+            api_host,
+            kwargs.get("use_https", True),
+            self.logger,
+            request_timeout=timeout,
+            scope=scope,
+        )
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.pages = PageClient(self.transport, self.logger)
@@ -98,58 +106,59 @@ class Domo:
         self.accounts = AccountClient(self.transport, self.logger)
         self.utilities = UtilitiesClient(self.transport, self.logger)
 
-######### Datasets #########
+    ######### Datasets #########
     def ds_meta(self, dataset_id):
         """
-            Get a DataSet metadata
+        Get a DataSet metadata
 
-            :Parameters:
-            - `dataset_id`: id of a dataset (str)
+        :Parameters:
+        - `dataset_id`: id of a dataset (str)
 
-            :Returns:
-            - A dict representing the dataset meta-data
+        :Returns:
+        - A dict representing the dataset meta-data
         """
         return self.datasets.get(dataset_id)
 
     def ds_delete(self, dataset_id, prompt_before_delete=True):
         """
-            Delete a DataSet naming convention equivalent with rdomo
-            
-            :Parameters:
-            - `dataset_id`: id of a dataset (str)
+        Delete a DataSet naming convention equivalent with rdomo
+
+        :Parameters:
+        - `dataset_id`: id of a dataset (str)
         """
 
-        del_data = 'Y'
+        del_data = "Y"
         if prompt_before_delete:
-            del_data = input("Permanently delete this data set? This is destructive and cannot be reversed. (Y/n)")
+            del_data = input(
+                "Permanently delete this data set? This is destructive and cannot be reversed. (Y/n)"
+            )
 
-        out = 'Data set not deleted'
-        if del_data == 'Y':
+        out = "Data set not deleted"
+        if del_data == "Y":
             out = self.datasets.delete(dataset_id)
 
         return out
 
-    def ds_list(self, df_output = True, per_page=50, offset=0, limit=0, name_like=""):
+    def ds_list(self, df_output=True, per_page=50, offset=0, limit=0, name_like=""):
         """
-            List DataSets
+        List DataSets
 
-            >>> l = domo.ds_list(df_output=True)
-            >>> print(l.head())
+        >>> l = domo.ds_list(df_output=True)
+        >>> print(l.head())
 
-            :Parameters:
-            - `df_output`:  should the result be a dataframe. Default True (Boolean)
-            - `per_page`:   results per page. Default 50 (int)
-            - `offset`:     offset if you need to paginate results. Default 0 (int)
-            - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
+        :Parameters:
+        - `df_output`:  should the result be a dataframe. Default True (Boolean)
+        - `per_page`:   results per page. Default 50 (int)
+        - `offset`:     offset if you need to paginate results. Default 0 (int)
+        - `limit`:      max ouput to return. If 0 then return all results on page. Default 0 (int)
 
-            :Returns:
-            list or pandas dataframe depending on parameters
+        :Returns:
+        list or pandas dataframe depending on parameters
 
         """
-        datasources = self.datasets.list(per_page=per_page,
-                                         offset=offset,
-                                         limit=limit,
-                                         name_like=name_like)
+        datasources = self.datasets.list(
+            per_page=per_page, offset=offset, limit=limit, name_like=name_like
+        )
         if df_output == False:
             out = list(datasources)
         else:
@@ -158,82 +167,134 @@ class Domo:
 
     def ds_query(self, dataset_id, query, return_data=True):
         """
-            Evaluate query and return dataset in a dataframe
+        Evaluate query and return dataset in a dataframe
 
-            >>> query = {"sql": "SELECT * FROM table LIMIT 2"}
-            >>> ds = domo.ds_query('80268aef-e6a1-44f6-a84c-f849d9db05fb', query)
-            >>> print(ds.head())
+        >>> query = {"sql": "SELECT * FROM table LIMIT 2"}
+        >>> ds = domo.ds_query('80268aef-e6a1-44f6-a84c-f849d9db05fb', query)
+        >>> print(ds.head())
 
-            :Parameters:
-            - `dataset_id`:     id of a dataset (str)
-            - `query`:          query object (dict)
-            - `return_data`:    should the result be a dataframe. Default True (Boolean)
+        :Parameters:
+        - `dataset_id`:     id of a dataset (str)
+        - `query`:          query object (dict)
+        - `return_data`:    should the result be a dataframe. Default True (Boolean)
 
-            :Returns:
-            dict or pandas dataframe depending on parameters
+        :Returns:
+        dict or pandas dataframe depending on parameters
         """
         output = self.datasets.query(dataset_id, query)
-        if(return_data == True):
-            output = DataFrame(output['rows'], columns = output['columns'])
+        if return_data == True:
+            output = DataFrame(output["rows"], columns=output["columns"])
         return output
 
-
-    def ds_get(self, dataset_id):
+    def ds_get(self, dataset_id, use_schema=True) -> DataFrame:
         """
-            Export data to pandas Dataframe
+        Export data to pandas Dataframe
 
-            >>> df = domo.ds_get('80268aef-e6a1-44f6-a84c-f849d9db05fb')
-            >>> print(df.head())
+        >>> df = domo.ds_get('80268aef-e6a1-44f6-a84c-f849d9db05fb')
+        >>> print(df.head())
 
-            :Parameters:
-            - `dataset_id`:     id of a dataset (str)
-
-            :Returns:
-            pandas dataframe
+        :Parameters:
+        - `dataset_id`:     id of a dataset (str)
+        - `use_schema`: whether to use the dataset schema to determine column types (bool, default True) via type_mapping
+        :Returns:
+        pandas dataframe
         """
         csv_download = self.datasets.data_export(dataset_id, include_csv_header=True)
-
         content = StringIO(csv_download)
-        df = read_csv(content)
 
-        # Convert to dates or datetimes if possible
-        for col in df.columns:
-            if df[col].dtype == 'object':
-                try:
-                    df[col] = to_datetime(df[col])
-                except ValueError:
-                    pass
-                except TypeError:
-                    pass
+        if use_schema:
+            try:
+                schema_dict = self.ds_meta(dataset_id)
+
+                if "schema" in schema_dict and "columns" in schema_dict["schema"]:
+                    # type mapping can be adjusted accordingly
+                    # there is no Date type in Pandas and Timestamps are not a type in Domo
+                    type_mapping = {
+                        "LONG": "Int64",
+                        "INTEGER": "Int64",
+                        "DECIMAL": "Float64",
+                        "DOUBLE": "Float64",
+                        "DATETIME": "datetime64[ns]",
+                        "DATE": "datetime64[ns]",
+                    }
+
+                    dtype_dict = {}
+                    date_columns = []
+
+                    for column in schema_dict["schema"]["columns"]:
+                        col_name = column["name"]
+                        col_type = column["type"]
+
+                        dtype_dict[col_name] = type_mapping.get(col_type, "object")
+
+                    if col_type in ("DATE", "DATETIME"):
+                        date_columns.append(col_name)
+
+                    if date_columns:
+                        df = read_csv(
+                            content, dtype=dtype_dict, parse_dates=date_columns
+                        )
+                    else:
+                        df = read_csv(content, dtype=dtype_dict)
+
+            except Exception:
+                # attempt to fallback to original behavior
+                content.seek(0)
+                df = read_csv(content)
+
+                # Convert to dates or datetimes if possible
+                for col in df.columns:
+                    if df[col].dtype == "object":
+                        try:
+                            df[col] = to_datetime(df[col])
+                        except ValueError:
+                            pass
+                        except TypeError:
+                            pass
+
+        else:
+            # default to original behavior
+            df = read_csv(content)
+
+            # Convert to dates or datetimes if possible
+            for col in df.columns:
+                if df[col].dtype == "object":
+                    try:
+                        df[col] = to_datetime(df[col])
+                    except ValueError:
+                        pass
+                    except TypeError:
+                        pass
 
         return df
-    
-    def ds_get_dict(self,ds_id):
-        my_data = self.datasets.data_export(ds_id,True)
+
+    def ds_get_dict(self, ds_id):
+        my_data = self.datasets.data_export(ds_id, True)
         dr = csv.DictReader(StringIO(my_data))
         data_list = list(dr)
-        return(data_list)
+        return data_list
 
-    def ds_create(self, df_up, name, description='',
-                  update_method='REPLACE', key_column_names=[]):
-        new_stream = self.utilities.stream_create(df_up,
-                                                  name,
-                                                  description,
-                                                  update_method,
-                                                  key_column_names)
+    def ds_create(
+        self, df_up, name, description="", update_method="REPLACE", key_column_names=[]
+    ):
+        new_stream = self.utilities.stream_create(
+            df_up, name, description, update_method, key_column_names
+        )
         if "dataSet" in new_stream:
-            ds_id = new_stream['dataSet']['id']
-            self.utilities.stream_upload(ds_id, df_up,
-                                         warn_schema_change=False)
+            ds_id = new_stream["dataSet"]["id"]
+            self.utilities.stream_upload(ds_id, df_up, warn_schema_change=False)
             return ds_id
         else:
-            raise Exception(("Stream creation didn't work as expected. "
-                             "Response: {}").format(new_stream))
+            raise Exception(
+                ("Stream creation didn't work as expected. Response: {}").format(
+                    new_stream
+                )
+            )
 
     def ds_update(self, ds_id, df_up):
         return self.utilities.stream_upload(ds_id, df_up)
 
-######### PDP #########
+    ######### PDP #########
 
     def pdp_create(self, dataset_id, pdp_request):
         """
@@ -279,28 +340,27 @@ class Domo:
         """
         return self.datasets.delete_pdp(dataset_id, policy_id)
 
-    def pdp_list(self, dataset_id, df_output = True):
+    def pdp_list(self, dataset_id, df_output=True):
         """
-            List PDP policies
+        List PDP policies
 
-            >>> l = domo.pdp_list(df_output=True)
-            >>> print(l.head())
+        >>> l = domo.pdp_list(df_output=True)
+        >>> print(l.head())
 
-            :Parameters:
-            - `dataset_id`:   id of dataset with PDP policies (str) Required
-            - `df_output`:  should the result be a dataframe. Default True (Boolean)
+        :Parameters:
+        - `dataset_id`:   id of dataset with PDP policies (str) Required
+        - `df_output`:  should the result be a dataframe. Default True (Boolean)
 
-            :Returns:
-            list or pandas dataframe depending on parameters
+        :Returns:
+        list or pandas dataframe depending on parameters
 
         """
         output = self.datasets.list_pdps(dataset_id)
-        if(df_output == True):
+        if df_output == True:
             output = DataFrame(output)
         return output
 
     def pdp_update(self, dataset_id, policy_id, policy_update):
-
         """
         Update a PDP policy
 
@@ -333,8 +393,7 @@ class Domo:
         """
         return self.datasets.update_pdp(dataset_id, policy_id, policy_update)
 
-
-######### Pages #########
+    ######### Pages #########
 
     def page_create(self, name, **kwargs):
         """Create a new page.
@@ -359,7 +418,6 @@ class Domo:
         """
         return self.pages.create(name, **kwargs)
 
-
     def page_get(self, page_id):
         """Get a page.
 
@@ -377,7 +435,6 @@ class Domo:
         """
         return self.pages.get(page_id)
 
-
     def page_delete(self, page_id):
         """Delete a page.
 
@@ -385,7 +442,6 @@ class Domo:
           - `page_id`: ID of the page to delete
         """
         return self.pages.delete(page_id)
-
 
     def collections_create(self, page_id, title, **kwargs):
         """Create a collection on a page.
@@ -407,7 +463,6 @@ class Domo:
         """
         return self.pages.create_collection(page_id, title, **kwargs)
 
-
     def page_get_collections(self, page_id):
         """Get a collections of a page
 
@@ -422,7 +477,6 @@ class Domo:
           - A list of dicts representing the collections
         """
         return self.pages.get_collections(page_id)
-
 
     def collections_update(self, page_id, collection_id=None, **kwargs):
         """Update a collection of a page.
@@ -459,7 +513,6 @@ class Domo:
         """
         return self.pages.update_collection(page_id, collection_id, **kwargs)
 
-
     def collections_delete(self, page_id, collection_id):
         """Delete a collection from a page.
 
@@ -469,14 +522,12 @@ class Domo:
         """
         return self.pages.delete_collection(page_id, collection_id)
 
-
     def page_list(self, per_page=50, offset=0, limit=0):
         """List pages.
         Returns a list of dicts (with nesting possible)
         If limit is supplied and non-zero, returns up to limit pages
         """
         return list(self.pages.list())
-
 
     def page_update(self, page_id=None, **kwargs):
         """Update a page.
@@ -512,103 +563,92 @@ class Domo:
         """
         return self.pages.update(page_id, **kwargs)
 
-
-######### Groups #########
+    ######### Groups #########
 
     def groups_add_users(self, group_id, user_id):
         """
-            Add a User to a Group
+        Add a User to a Group
         """
 
-        if isinstance(user_id,list):
+        if isinstance(user_id, list):
             for x in user_id:
                 self.groups.add_user(group_id, x)
         else:
             self.groups.add_user(group_id, user_id)
 
-        return 'success'
+        return "success"
 
-
-
-    def groups_create(self, group_name, users=-1, active='true'):
+    def groups_create(self, group_name, users=-1, active="true"):
         """
-            Create a Group
+        Create a Group
         """
-        req_body = {'name':group_name,'active':active}
+        req_body = {"name": group_name, "active": active}
         grp_created = self.groups.create(req_body)
-        if (not isinstance(users,list) and users > 0) or isinstance(users,list):
-            self.groups_add_users(grp_created['id'],users)
+        if (not isinstance(users, list) and users > 0) or isinstance(users, list):
+            self.groups_add_users(grp_created["id"], users)
 
         return grp_created
 
-
-
     def groups_delete(self, group_id):
         """
-            Delete a Group
+        Delete a Group
         """
         existing_users = self.groups_list_users(group_id)
-        self.groups_remove_users(group_id,existing_users)
+        self.groups_remove_users(group_id, existing_users)
         return self.groups.delete(group_id)
-
-
 
     def groups_get(self, group_id):
         """
-            Get a Group Definition
+        Get a Group Definition
         """
         return self.groups.get(group_id)
 
-
-
     def groups_list(self):
         """
-            List all groups in Domo instance in a pandas dataframe.
+        List all groups in Domo instance in a pandas dataframe.
         """
         grps = []
         n_ret = 1
         off = 0
         batch_size = 500
         while n_ret > 0:
-            gg = self.groups.list(batch_size,off*batch_size)
+            gg = self.groups.list(batch_size, off * batch_size)
             grps.extend(gg)
             n_ret = gg.__len__()
             off += 1
         return DataFrame(grps)
 
-
     def groups_list_users(self, group_id):
         """
-            List Users in a Group
+        List Users in a Group
         """
         user_list = []
         n_ret = 1
         off = 0
-        batch_size=500
+        batch_size = 500
         while n_ret > 0:
-            i_users = self.groups.list_users(group_id,limit=batch_size,offset=off*batch_size)
+            i_users = self.groups.list_users(
+                group_id, limit=batch_size, offset=off * batch_size
+            )
             user_list.extend(i_users)
             n_ret = i_users.__len__()
             off += 1
 
         return user_list
 
-
-
     def groups_remove_users(self, group_id, user_id):
         """
-            Remove a User to a Group
+        Remove a User to a Group
         """
-        if isinstance(user_id,list):
+        if isinstance(user_id, list):
             for x in user_id:
                 self.groups.remove_user(group_id, x)
         else:
             self.groups.remove_user(group_id, user_id)
 
-        return 'success'
+        return "success"
 
-
-######### Accounts #########
+    ######### Accounts #########
     def accounts_list(self):
         """List accounts.
         Returns a generator that will call the API multiple times
@@ -683,18 +723,18 @@ class Domo:
         """
         return self.accounts.update(account_id, **kwargs)
 
-######### Users #########
+    ######### Users #########
     def users_add(self, x_name, x_email, x_role, x_sendInvite=False):
         uu = CreateUserRequest()
         uu.name = x_name
         uu.email = x_email
         uu.role = x_role
-        return self.users.create(uu,x_sendInvite)
+        return self.users.create(uu, x_sendInvite)
 
     def users_get(self, user_id):
         return self.users.get(user_id)
 
-    def users_list(self,df_output=True):
+    def users_list(self, df_output=True):
         return self.users.list_all(df_output)
 
     def users_update(self, user_id, user_def):
