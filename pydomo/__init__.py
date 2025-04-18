@@ -13,7 +13,6 @@ from pydomo.accounts import AccountClient
 from pydomo.utilities import UtilitiesClient
 from pandas import read_csv
 from pandas import DataFrame
-from pandas import to_datetime
 from io import StringIO
 import logging
 import json
@@ -186,8 +185,9 @@ class Domo:
             >>> print(df.head())
 
             :Parameters:
-            - `dataset_id`:     id of a dataset (str)
-            - `use_schema`: whether to use the dataset schema to determine column types (bool, default True) via type_mapping
+            - `dataset_id`: id of a dataset (str)
+            - `use_schema`: whether to use the dataset schema to determine column types (bool, default True)
+                                if false, let pandas dynamically determine types from the data
             :Returns:
             pandas dataframe
         """
@@ -199,16 +199,6 @@ class Domo:
                 schema_dict = self.ds_meta(dataset_id)
 
                 if "schema" in schema_dict and "columns" in schema_dict["schema"]:
-                    # type mapping can be adjusted accordingly
-                    # there is no Date type in Pandas and Timestamps are not a type in Domo
-                    type_mapping = {
-                        "LONG": "Int64",
-                        "INTEGER": "Int64",
-                        "DECIMAL": "Float64",
-                        "DOUBLE": "Float64",
-                        "DATETIME": "datetime64[ns]",
-                        "DATE": "datetime64[ns]",
-                    }
 
                     dtype_dict = {}
                     date_columns = []
@@ -217,48 +207,25 @@ class Domo:
                         col_name = column["name"]
                         col_type = column["type"]
 
-                        dtype_dict[col_name] = type_mapping.get(col_type, "object")
+                        dtype_dict[col_name] = self.utilities.convert_domo_type_to_pandas_type(col_type)
 
-                    if col_type in ("DATE", "DATETIME"):
-                        date_columns.append(col_name)
+                        if self.utilities.is_date_type(col_type):
+                            date_columns.append(col_name)
 
-                    if date_columns:
-                        df = read_csv(
-                            content, dtype=dtype_dict, parse_dates=date_columns
-                        )
-                    else:
-                        df = read_csv(content, dtype=dtype_dict)
+                    return read_csv(
+                        content, dtype=dtype_dict, parse_dates=date_columns
+                    )
 
-            except Exception:
-                # attempt to fallback to original behavior
+            except Exception as err:
+                print(f"""An error occurred while converting domo schema to pandas dtypes. 
+                Letting pandas attempt to read the data. Error={err}""")
+
                 content.seek(0)
-                df = read_csv(content)
-
-                # Convert to dates or datetimes if possible
-                for col in df.columns:
-                    if df[col].dtype == "object":
-                        try:
-                            df[col] = to_datetime(df[col])
-                        except ValueError:
-                            pass
-                        except TypeError:
-                            pass
+                
+                return self.utilities.read_content_to_dataframe(content)
 
         else:
-            # default to original behavior
-            df = read_csv(content)
-
-            # Convert to dates or datetimes if possible
-            for col in df.columns:
-                if df[col].dtype == "object":
-                    try:
-                        df[col] = to_datetime(df[col])
-                    except ValueError:
-                        pass
-                    except TypeError:
-                        pass
-
-        return df
+            return self.utilities.read_content_to_dataframe(content)
     
     def ds_get_dict(self,ds_id):
         my_data = self.datasets.data_export(ds_id,True)
