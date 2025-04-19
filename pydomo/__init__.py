@@ -221,11 +221,9 @@ class Domo:
                 Letting pandas attempt to read the data. Error={err}""")
 
                 content.seek(0)
-                
-                return self.utilities.read_content_to_dataframe(content)
 
-        else:
-            return self.utilities.read_content_to_dataframe(content)
+        return self.utilities.read_content_to_dataframe(content)
+
     
     def ds_get_dict(self,ds_id):
         my_data = self.datasets.data_export(ds_id,True)
