@@ -13,7 +13,6 @@ from pydomo.accounts import AccountClient
 from pydomo.utilities import UtilitiesClient
 from pandas import read_csv
 from pandas import DataFrame
-from pandas import to_datetime
 from io import StringIO
 import logging
 import json
@@ -178,7 +177,7 @@ class Domo:
         return output
 
 
-    def ds_get(self, dataset_id):
+    def ds_get(self, dataset_id, use_schema=True) -> DataFrame:
         """
             Export data to pandas Dataframe
 
@@ -186,27 +185,45 @@ class Domo:
             >>> print(df.head())
 
             :Parameters:
-            - `dataset_id`:     id of a dataset (str)
-
+            - `dataset_id`: id of a dataset (str)
+            - `use_schema`: whether to use the dataset schema to determine column types (bool, default True)
+                                if false, let pandas dynamically determine types from the data
             :Returns:
             pandas dataframe
         """
         csv_download = self.datasets.data_export(dataset_id, include_csv_header=True)
-
         content = StringIO(csv_download)
-        df = read_csv(content)
 
-        # Convert to dates or datetimes if possible
-        for col in df.columns:
-            if df[col].dtype == 'object':
-                try:
-                    df[col] = to_datetime(df[col])
-                except ValueError:
-                    pass
-                except TypeError:
-                    pass
+        if use_schema:
+            try:
+                schema_dict = self.ds_meta(dataset_id)
 
-        return df
+                if "schema" in schema_dict and "columns" in schema_dict["schema"]:
+
+                    dtype_dict = {}
+                    date_columns = []
+
+                    for column in schema_dict["schema"]["columns"]:
+                        col_name = column["name"]
+                        col_type = column["type"]
+
+                        dtype_dict[col_name] = self.utilities.convert_domo_type_to_pandas_type(col_type)
+
+                        if self.utilities.is_date_type(col_type):
+                            date_columns.append(col_name)
+
+                    return read_csv(
+                        content, dtype=dtype_dict, parse_dates=date_columns
+                    )
+
+            except Exception as err:
+                print(f"""An error occurred while converting domo schema to pandas dtypes. 
+                Letting pandas attempt to read the data. Error={err}""")
+
+                content.seek(0)
+
+        return self.utilities.read_content_to_dataframe(content)
+
     
     def ds_get_dict(self,ds_id):
         my_data = self.datasets.data_export(ds_id,True)

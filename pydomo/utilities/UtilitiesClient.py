@@ -3,6 +3,8 @@ import json
 import math
 import sys
 import json
+from pandas import read_csv
+from pandas import to_datetime
 
 from pydomo.DomoAPIClient import DomoAPIClient
 from pydomo.datasets import DataSetClient
@@ -36,6 +38,38 @@ class UtilitiesClient(DomoAPIClient):
             result = 'DOUBLE'
 
         return result
+
+    def convert_domo_type_to_pandas_type(self, domo_type):
+        # type mapping can be adjusted accordingly
+        # there is no Date type in Pandas and Timestamps are not a type in Domo
+        type_mapping = {
+            "LONG": "Int64",
+            "STRING": "string",
+            "DECIMAL": "Float64",
+            "DOUBLE": "Float64",
+            "DATETIME": "datetime64[ns]",
+            "DATE": "datetime64[ns]",
+        }
+
+        return type_mapping.get(domo_type, "object")
+
+    def is_date_type(self, column_type):
+        return column_type in ("DATE", "DATETIME")
+
+    def read_content_to_dataframe(self, content):
+        df = read_csv(content)
+
+        # Convert to dates or datetimes if possible
+        for col in df.columns:
+            if df[col].dtype == "object":
+                try:
+                    df[col] = to_datetime(df[col])
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
+
+        return df
 
     def identical(self, c1, c2):
         cc1 = json.dumps(c1)
