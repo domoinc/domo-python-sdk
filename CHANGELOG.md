@@ -1,7 +1,17 @@
 # PyDomo Changelog
 
+### v0.3.0.12
+April 21, 2025
+
+Updates
+* Add scope support when creating `Domo` SDK client
+* Add use schema feature to `ds_get` method to convert Domo columns to pandas dtypes
+
 ### v0.3.0.11
 January 31, 2024
+
+Notes
+* Version not uploaded to pypi
 
 Updates
 * Modify the authentication process to conform to new API functionality.
