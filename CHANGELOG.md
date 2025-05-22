@@ -1,5 +1,14 @@
 # PyDomo Changelog
 
+### v0.3.0.13
+May 22, 2025
+
+Bug Fixes
+* Only save column to `dtype_dict` when not a date column
+
+Improvements
+* Add `connection_file` as a parameter to Domo client init to provide ini file with connection parameters
+
 ### v0.3.0.12
 April 21, 2025
 
