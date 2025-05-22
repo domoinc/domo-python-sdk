@@ -234,10 +234,11 @@ class Domo:
                         col_name = column["name"]
                         col_type = column["type"]
 
-                        dtype_dict[col_name] = self.utilities.convert_domo_type_to_pandas_type(col_type)
 
                         if self.utilities.is_date_type(col_type):
                             date_columns.append(col_name)
+                        else:
+                            dtype_dict[col_name] = self.utilities.convert_domo_type_to_pandas_type(col_type)
 
                     return read_csv(
                         content, dtype=dtype_dict, parse_dates=date_columns
