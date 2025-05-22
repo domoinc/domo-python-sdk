@@ -75,7 +75,7 @@ parent_logger.setLevel(logging.WARNING)
 
 
 class Domo:
-    def __init__(self, client_id, client_secret, api_host='api.domo.com', **kwargs):
+    def __init__(self, client_id=None, client_secret=None, connection_file=None, api_host='api.domo.com', **kwargs):
         if 'logger_name' in kwargs:
             self.logger = parent_logger.getChild(kwargs['logger_name'])
         else:
@@ -83,12 +83,38 @@ class Domo:
 
         timeout = kwargs.get('request_timeout', None)
         scope = kwargs.get('scope')
+        use_https = kwargs.get('use_https', True)
 
         if kwargs.get('log_level'):
             self.logger.setLevel(kwargs['log_level'])
         self.logger.debug("\n" + DOMO + "\n")
 
-        self.transport = DomoAPITransport(client_id, client_secret, api_host, kwargs.get('use_https', True), self.logger, request_timeout = timeout, scope = scope)
+        # Validate credential inputs
+        if connection_file:
+            if client_id or client_secret:
+                raise ValueError("Cannot specify both connection_file and client_id/client_secret")
+            try:
+                import configparser
+                config = configparser.ConfigParser()
+                config.read(connection_file)
+                if 'client_auth' not in config:
+                    raise ValueError("connection_file must contain a [client_auth] section")
+                client_auth = config['client_auth']
+                client_id = client_auth.get('client')
+                client_secret = client_auth.get('secret')
+
+                if not client_id or not client_secret:
+                    raise ValueError("connection_file must contain both client and secret in [client_auth] section")
+                # Optional overrides from config
+                api_host = client_auth.get('api_host', api_host)
+                if 'use_https' in client_auth:
+                    use_https = client_auth.get('use_https').lower() == 'true'
+            except Exception as e:
+                raise ValueError(f"Error reading connection_file: {str(e)}")
+        elif not client_id or not client_secret:
+            raise ValueError("Must provide either connection_file or both client_id and client_secret")
+
+        self.transport = DomoAPITransport(client_id, client_secret, api_host, use_https, self.logger, request_timeout = timeout, scope = scope)
         self.datasets = DataSetClient(self.transport, self.logger)
         self.groups = GroupClient(self.transport, self.logger)
         self.pages = PageClient(self.transport, self.logger)
@@ -96,6 +122,7 @@ class Domo:
         self.users = UserClient(self.transport, self.logger)
         self.accounts = AccountClient(self.transport, self.logger)
         self.utilities = UtilitiesClient(self.transport, self.logger)
+
 
 ######### Datasets #########
     def ds_meta(self, dataset_id):
