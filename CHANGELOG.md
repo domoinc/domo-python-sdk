@@ -1,5 +1,14 @@
 # PyDomo Changelog
 
+### v0.3.0.14
+October 28, 2025
+
+Bug Fixes
+* Fixes lack of support for Python datatypes to Domo datatypes in UtilitiesClient type_conversion_text method
+
+Improvements
+* Renames `typeConversionText` to `type_conversion_text` in `UtilitiesClient` to conform to Python naming conventions
+
 ### v0.3.0.13
 May 22, 2025
 
@@ -81,7 +90,7 @@ Bug Fixes
     * groups_list now pages through all lists automatically
     * groups_list_users now pages through all users automatically
     * groups_remove_users now removes a list of users
-    * groups_delete now removes all users from the group and then deletes the group 
+    * groups_delete now removes all users from the group and then deletes the group
 
 ### v0.3.0
 January 8, 2021
