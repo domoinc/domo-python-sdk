@@ -1,5 +1,11 @@
 # PyDomo Changelog
 
+### v0.3.0.15
+Nov 6, 2025
+
+Bug Fixes
+* Fixes issue where `UtilitiesClient#stream_upload` could fail with error `Too many non-consecutive part ids. Make consecutive or upload multiple data versions` when uploading data
+
 ### v0.3.0.14
 October 28, 2025
 
