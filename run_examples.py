@@ -6,7 +6,7 @@ Domo Python SDK Usage
 
 - To run this example file:
 -- Copy and paste the contents of this file
--- Plug in your CLIENT_ID and CLIENT_SECRET (https://developer.domo.com/manage-clients), and execute "python3 run_examples.py"
+-- Plug in your CLIENT_ID and CLIENT_SECRET and MY_EMAIL (https://developer.domo.com/manage-clients), and execute "python3 run_examples.py"
 
 - These tests clean up after themselves; several objects are created and deleted on your Domo instance
 - If you encounter a 'Not Allowed' error, this is a permissions issue. Please speak with your Domo Administrator.
@@ -24,7 +24,6 @@ from pydomo import Domo
 from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType, Policy
 from pydomo.datasets import PolicyFilter, FilterOperator, PolicyType, Sorting
 from pydomo.users import CreateUserRequest
-from pydomo.datasets import DataSetRequest, Schema, Column, ColumnType
 from pydomo.streams import UpdateMethod, CreateStreamRequest
 from pydomo.groups import CreateGroupRequest
 
@@ -32,6 +31,9 @@ from pydomo.groups import CreateGroupRequest
 # My Domo Client ID and Secret (https://developer.domo.com/manage-clients)
 CLIENT_ID = 'MY_CLIENT_ID'
 CLIENT_SECRET = 'MY_CLIENT_SECRET'
+
+# Your email to identify your user id in Domo
+MY_EMAIL = 'your@email.com'
 
 # The Domo API host domain. This can be changed as needed - for use with a proxy or test environment
 API_HOST = 'api.domo.com'
@@ -153,9 +155,15 @@ class DomoSDKExamples:
         pdp_request.filters = [pdp_filter]
         pdp_request.type = PolicyType.USER
         # The affected user ids (restricted access by filter)
-        pdp_request.users = [998, 999]
+        user_list = domo.users.list(10, 0)
+        user1 = user_list[0]
+        user2 = user_list[1]
+        pdp_request.users = [user1['id'], user2['id']]
         # The affected group ids (restricted access by filter)
-        pdp_request.groups = [99, 100]
+        group_list = domo.groups.list(10, 0)
+        group1 = group_list[0]
+        group2 = group_list[1]
+        pdp_request.groups = [group1['id'], group2['id']]
 
         # Create the PDP
         pdp = datasets.create_pdp(dataset['id'], pdp_request)
@@ -375,7 +383,7 @@ class DomoSDKExamples:
         # Update a Group
         group_update = CreateGroupRequest()
         group_update.name = 'Groupy Group {}'.format(random.randint(0, 10000))
-        group_update.active = False
+        group_update.active = True
         group_update.default = False
         group = groups.update(group['id'], group_update)
         domo.logger.info("Updated Group '{}'".format(group['name']))
@@ -396,6 +404,19 @@ class DomoSDKExamples:
 
         # Remove a User from a Group
         groups.remove_user(group['id'], user['id'])
+        # List Users and find yourself
+        user_list = domo.users.list(500, 0)  # Adjust the limit as needed
+        my_user_id = None
+        for user in user_list:
+            if user['email'] == MY_EMAIL:
+                my_user_id = user['id']
+                break
+        
+        if my_user_id:
+            domo.logger.info(f"Found my User ID: {my_user_id}")
+        else:
+            domo.logger.info("My user ID was not found.")
+        groups.remove_user(group['id'],my_user_id)
         domo.logger.info("Removed User {} from Group {}".format(user['id'],
                                                                 group['id']))
 
@@ -422,6 +443,9 @@ class DomoSDKExamples:
 
         # Update the page using returned page
         page['name'] = 'Updated Page'
+        domo.logger.info("Page keys before update: {}".format(list(page.keys())))
+        if 'owners' in page:
+                del page['owners']  # Remove the 'owners' key
         domo.pages.update(**page)
         domo.logger.info("Renamed Page {}".format(page['id']))
 
