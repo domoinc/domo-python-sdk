@@ -31,15 +31,17 @@ class UtilitiesClient(DomoAPIClient):
     def type_conversion_text(self, dt):
         """Convert data type strings to standardized type names."""
 
-        if dt in {'<M8[ns]', 'datetime64', 'datetime64[ns]', 'datetime64[us]', 'datetime64[ms]', 'datetime64[s]'}:
+        dt_str = str(dt)
+
+        if dt_str in {'<M8[ns]', 'datetime64', 'datetime64[ns]', 'datetime64[us]', 'datetime64[ms]', 'datetime64[s]'}:
             return 'DATETIME'
-        elif dt in {'uint8', 'uint16', 'uint32', 'uint64', 'int8', 'int16', 'int32', 'int64', 'Int8', 'Int16', 'Int32', 'Int64'}:
+        elif dt_str in {'uint8', 'uint16', 'uint32', 'uint64', 'int8', 'int16', 'int32', 'int64', 'Int8', 'Int16', 'Int32', 'Int64'}:
             return 'LONG'
-        elif dt in {'float16', 'float32', 'float64', 'Float32', 'Float64'}:
+        elif dt_str in {'float16', 'float32', 'float64', 'Float32', 'Float64'}:
             return 'DOUBLE'
-        elif dt in {'date', 'datetime.date'}:
+        elif dt_str in {'date', 'datetime.date'}:
             return 'DATE'
-        elif dt in {'decimal', 'decimal.Decimal'}:
+        elif dt_str in {'decimal', 'decimal.Decimal'}:
             return 'DECIMAL'
         else:
             return 'STRING'
