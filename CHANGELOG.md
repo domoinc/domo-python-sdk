@@ -1,7 +1,16 @@
 # PyDomo Changelog
 
+### v0.3.0.16
+November 12, 2025
+
+Bug Fixes
+* Fixes Pandas type check in UtilitiesClient type_conversion_text method
+
+Improvements
+* Adds unit tests for `UtilitiesClient` and adds unit test documentation
+
 ### v0.3.0.15
-Nov 6, 2025
+November 6, 2025
 
 Bug Fixes
 * Fixes issue where `UtilitiesClient#stream_upload` could fail with error `Too many non-consecutive part ids. Make consecutive or upload multiple data versions` when uploading data
