@@ -29,13 +29,13 @@ class AsyncDomoAPIClient:
     async def _list(self, url: str, params: dict[str, Any] | None = None) -> Any:
         return await self.transport.get(url, params=params)
 
-    async def _update(self, url: str, body: Any, method: str = "PUT") -> Any:
+    async def _update(self, url: str, body: Any, method: str = "PUT", params: dict[str, Any] | None = None) -> Any:
         if method == "PATCH":
             return await self.transport.patch(url, body=body)
-        return await self.transport.put(url, body=body)
+        return await self.transport.put(url, body=body, params=params)
 
-    async def _delete(self, url: str) -> None:
-        await self.transport.delete(url)
+    async def _delete(self, url: str, params: dict[str, Any] | None = None) -> Any:
+        return await self.transport.delete(url, params=params)
 
     async def _upload_csv(self, url: str, csv_data: bytes | str) -> Any:
         return await self.transport.put_csv(url, body=csv_data)
