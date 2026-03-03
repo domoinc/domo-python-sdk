@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from pydantic import Field
 
@@ -13,8 +14,10 @@ from domo_sdk.models.datasets import UpdateMethod
 class StreamExecution(DomoModel):
     """Stream execution details."""
 
-    id: int
-    start_time: datetime | None = Field(default=None, alias="startedAt")
+    id: int = 0
+    start_time: datetime | None = Field(
+        default=None, alias="startedAt"
+    )
     end_time: datetime | None = Field(default=None, alias="endedAt")
     current_state: str = Field(default="", alias="currentState")
     rows: int = 0
@@ -24,8 +27,16 @@ class StreamExecution(DomoModel):
 class Stream(DomoModel):
     """Stream response from API."""
 
-    id: int
-    dataset: dict | None = Field(default=None, alias="dataSet")
-    update_method: UpdateMethod = Field(default=UpdateMethod.REPLACE, alias="updateMethod")
-    created_at: datetime | None = Field(default=None, alias="createdAt")
-    modified_at: datetime | None = Field(default=None, alias="modifiedAt")
+    id: int = 0
+    dataset: dict[str, Any] | None = Field(
+        default=None, alias="dataSet"
+    )
+    update_method: UpdateMethod = Field(
+        default=UpdateMethod.REPLACE, alias="updateMethod"
+    )
+    created_at: datetime | None = Field(
+        default=None, alias="createdAt"
+    )
+    modified_at: datetime | None = Field(
+        default=None, alias="modifiedAt"
+    )
