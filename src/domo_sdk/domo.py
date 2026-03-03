@@ -10,6 +10,7 @@ from domo_sdk.async_clients.accounts import AsyncAccountClient
 from domo_sdk.async_clients.activity_log import AsyncActivityLogClient
 from domo_sdk.async_clients.ai import AsyncAIClient
 from domo_sdk.async_clients.alerts import AsyncAlertsClient
+from domo_sdk.async_clients.appdb import AsyncAppDBClient
 from domo_sdk.async_clients.cards import AsyncCardClient
 from domo_sdk.async_clients.connectors import AsyncConnectorsClient
 from domo_sdk.async_clients.dataflows import AsyncDataflowsClient
@@ -31,6 +32,7 @@ from domo_sdk.clients.accounts import AccountClient
 from domo_sdk.clients.activity_log import ActivityLogClient
 from domo_sdk.clients.ai import AIClient
 from domo_sdk.clients.alerts import AlertsClient
+from domo_sdk.clients.appdb import AppDBClient
 from domo_sdk.clients.cards import CardClient
 from domo_sdk.clients.connectors import ConnectorsClient
 from domo_sdk.clients.dataflows import DataflowsClient
@@ -175,6 +177,7 @@ class Domo:
         self.files = FilesClient(self.transport)
         self.s3_export = S3ExportClient(self.transport)
         self.ai = AIClient(self.transport)
+        self.appdb = AppDBClient(self.transport)
 
     @classmethod
     def from_env(
@@ -271,6 +274,7 @@ class AsyncDomo:
         self.files = AsyncFilesClient(self.transport)
         self.s3_export = AsyncS3ExportClient(self.transport)
         self.ai = AsyncAIClient(self.transport)
+        self.appdb = AsyncAppDBClient(self.transport)
 
     async def close(self) -> None:
         """Close the underlying transport."""
