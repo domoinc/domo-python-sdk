@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.clients.base import DomoAPIClient
+from domo_sdk.models.activity_log import AuditEntry
 
 URL_BASE = "/v1/audit"
 
@@ -22,7 +23,7 @@ class ActivityLogClient(DomoAPIClient):
         end: int | None = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> list:
+    ) -> list[AuditEntry]:
         """Query audit log entries."""
         params: dict[str, Any] = {"limit": limit, "offset": offset}
         if user is not None:
@@ -31,4 +32,5 @@ class ActivityLogClient(DomoAPIClient):
             params["start"] = start
         if end is not None:
             params["end"] = end
-        return self._list(URL_BASE, params=params)
+        data = self._list(URL_BASE, params=params)
+        return [AuditEntry.model_validate(e) for e in data]

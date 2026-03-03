@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.async_clients.base import AsyncDomoAPIClient
+from domo_sdk.models.embed import EmbedToken
 
 URL_BASE = "/v1/embed"
 
@@ -20,37 +21,23 @@ class AsyncEmbedClient(AsyncDomoAPIClient):
         card_id: int,
         expiration: int | None = None,
         **kwargs: Any,
-    ) -> dict:
-        """Create an embed token for a card.
-
-        Parameters
-        ----------
-        card_id:
-            The ID of the card to embed.
-        expiration:
-            Optional token expiration in seconds.
-        """
+    ) -> EmbedToken:
+        """Create an embed token for a card."""
         body: dict[str, Any] = {"cardId": card_id, **kwargs}
         if expiration is not None:
             body["expiration"] = expiration
-        return await self._create(f"{URL_BASE}/card", body)
+        data = await self._create(f"{URL_BASE}/card", body)
+        return EmbedToken.model_validate(data)
 
     async def create_dashboard_token(
         self,
         page_id: int,
         expiration: int | None = None,
         **kwargs: Any,
-    ) -> dict:
-        """Create an embed token for a dashboard (page).
-
-        Parameters
-        ----------
-        page_id:
-            The ID of the page/dashboard to embed.
-        expiration:
-            Optional token expiration in seconds.
-        """
+    ) -> EmbedToken:
+        """Create an embed token for a dashboard (page)."""
         body: dict[str, Any] = {"pageId": page_id, **kwargs}
         if expiration is not None:
             body["expiration"] = expiration
-        return await self._create(f"{URL_BASE}/dashboard", body)
+        data = await self._create(f"{URL_BASE}/dashboard", body)
+        return EmbedToken.model_validate(data)

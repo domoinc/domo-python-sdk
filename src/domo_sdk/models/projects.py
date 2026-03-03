@@ -31,9 +31,9 @@ class Task(DomoModel):
     created_by: int = Field(default=0, alias="createdBy")
     created_at: datetime | None = Field(default=None, alias="createdDate")
     owned_by: int = Field(default=0, alias="ownedBy")
-    tags: list[str] = []
-    attachments: list[Attachment] = []
-    contributors: list[int] = []
+    tags: list[str] = Field(default_factory=list)
+    attachments: list[Attachment] = Field(default_factory=list)
+    contributors: list[int] = Field(default_factory=list)
 
 
 class TaskList(DomoModel):
@@ -42,7 +42,7 @@ class TaskList(DomoModel):
     id: int | None = None
     name: str = ""
     index: int = 0
-    tasks: list[Task] = []
+    tasks: list[Task] = Field(default_factory=list)
 
 
 class Project(DomoModel):
@@ -53,6 +53,6 @@ class Project(DomoModel):
     description: str = ""
     created_at: datetime | None = Field(default=None, alias="createdDate")
     due_date: datetime | None = Field(default=None, alias="dueDate")
-    members: list[dict[str, Any]] = []
+    members: list[dict[str, Any]] = Field(default_factory=list)
     public: bool = False
-    task_lists: list[TaskList] = Field(default=[], alias="lists")
+    task_lists: list[TaskList] = Field(default_factory=list, alias="lists")

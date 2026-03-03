@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from domo_sdk.clients.base import DomoAPIClient
+from domo_sdk.models.streams import StreamExecution
 
 
 class ConnectorsClient(DomoAPIClient):
@@ -11,6 +12,9 @@ class ConnectorsClient(DomoAPIClient):
     Docs: https://developer.domo.com/docs/connectors-api-reference/connectors
     """
 
-    def run(self, stream_id: int) -> dict:
+    def run(self, stream_id: int) -> StreamExecution:
         """Trigger an execution for a connector stream."""
-        return self._create(f"/data/v1/streams/{stream_id}/executions", None)
+        data = self._create(
+            f"/data/v1/streams/{stream_id}/executions", None
+        )
+        return StreamExecution.model_validate(data)

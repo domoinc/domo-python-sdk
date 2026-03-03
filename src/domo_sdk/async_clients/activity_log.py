@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.async_clients.base import AsyncDomoAPIClient
+from domo_sdk.models.activity_log import AuditEntry
 
 URL_BASE = "/v1/audit"
 
@@ -22,22 +23,8 @@ class AsyncActivityLogClient(AsyncDomoAPIClient):
         limit: int = 50,
         offset: int = 0,
         user: int | None = None,
-    ) -> list[dict]:
-        """Query activity log entries.
-
-        Parameters
-        ----------
-        start:
-            Start time in epoch milliseconds.
-        end:
-            End time in epoch milliseconds.
-        limit:
-            Maximum number of entries to return.
-        offset:
-            Offset for pagination.
-        user:
-            Optional user ID to filter by.
-        """
+    ) -> list[AuditEntry]:
+        """Query activity log entries."""
         params: dict[str, Any] = {
             "start": start,
             "end": end,
@@ -47,4 +34,5 @@ class AsyncActivityLogClient(AsyncDomoAPIClient):
         if user is not None:
             params["user"] = user
 
-        return await self._list(URL_BASE, params=params)
+        data = await self._list(URL_BASE, params=params)
+        return [AuditEntry.model_validate(e) for e in data]

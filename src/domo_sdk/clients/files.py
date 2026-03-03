@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from domo_sdk.clients.base import DomoAPIClient
+from domo_sdk.models.files import File
 
 URL_BASE = "/data/v1/data-files"
 
@@ -13,21 +14,25 @@ class FilesClient(DomoAPIClient):
     Docs: https://developer.domo.com/docs/data-files-api-reference/data-files
     """
 
-    def upload(self, file_data: bytes, name: str, description: str = "") -> dict:
+    def upload(
+        self, file_data: bytes, name: str, description: str = ""
+    ) -> File:
         """Upload a new file."""
         body = {"name": name, "description": description}
-        # POST the metadata first, then upload the binary content
-        # The Domo files API accepts multipart; we use the transport post
-        # with metadata params and handle file data via CSV transport.
-        return self._create(URL_BASE, body)
+        data = self._create(URL_BASE, body)
+        return File.model_validate(data)
 
-    def update(self, file_id: int, file_data: bytes) -> dict:
+    def update(self, file_id: int, file_data: bytes) -> File:
         """Update (replace) an existing file's contents."""
-        return self._upload_csv(f"{URL_BASE}/{file_id}", file_data)
+        data = self._upload_csv(f"{URL_BASE}/{file_id}", file_data)
+        return File.model_validate(data)
 
-    def get_details(self, file_id: int) -> dict:
+    def get_details(self, file_id: int) -> File:
         """Get file details."""
-        return self._get(f"{URL_BASE}/details", params={"fileId": file_id})
+        data = self._get(
+            f"{URL_BASE}/details", params={"fileId": file_id}
+        )
+        return File.model_validate(data)
 
     def download(self, file_id: int, revision_id: int) -> bytes:
         """Download a specific file revision.
@@ -37,6 +42,8 @@ class FilesClient(DomoAPIClient):
         url = f"{URL_BASE}/{file_id}/revision/{revision_id}"
         return self._get(url)
 
-    def set_permissions(self, file_id: int, permissions: list) -> None:
+    def set_permissions(
+        self, file_id: int, permissions: list
+    ) -> None:
         """Set permissions for a file."""
         self._update(f"{URL_BASE}/{file_id}/permissions", permissions)

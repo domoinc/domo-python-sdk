@@ -29,7 +29,7 @@ class File(DomoModel):
     size: int = 0
     created_at: datetime | None = Field(default=None, alias="createdAt")
     updated_at: datetime | None = Field(default=None, alias="updatedAt")
-    revisions: list[FileRevision] = []
+    revisions: list[FileRevision] = Field(default_factory=list)
     owner: dict[str, Any] | None = None
 
 

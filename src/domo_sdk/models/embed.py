@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pydantic import Field
+
 from domo_sdk.models.base import DomoModel
 
 
@@ -16,7 +18,7 @@ class EmbedPolicy(DomoModel):
 
     column: str = ""
     operator: str = ""
-    values: list[str] = []
+    values: list[str] = Field(default_factory=list)
 
 
 class EmbedToken(DomoModel):
@@ -24,5 +26,5 @@ class EmbedToken(DomoModel):
 
     token: str = ""
     expiration: int = 0
-    policies: list[EmbedPolicy] = []
-    permissions: list[str] = []
+    policies: list[EmbedPolicy] = Field(default_factory=list)
+    permissions: list[str] = Field(default_factory=list)

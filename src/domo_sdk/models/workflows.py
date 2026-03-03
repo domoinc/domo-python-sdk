@@ -15,7 +15,7 @@ class WorkflowPermission(DomoModel):
 
     type: str = ""  # "USER" or "GROUP"
     id: int = 0
-    permissions: list[str] = []
+    permissions: list[str] = Field(default_factory=list)
 
 
 class WorkflowModel(DomoModel):
@@ -37,4 +37,4 @@ class WorkflowInstance(DomoModel):
     started_at: datetime | None = Field(default=None, alias="startedAt")
     completed_at: datetime | None = Field(default=None, alias="completedAt")
     started_by: int = Field(default=0, alias="startedBy")
-    parameters: dict[str, Any] = {}
+    parameters: dict[str, Any] = Field(default_factory=dict)
