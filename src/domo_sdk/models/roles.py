@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pydantic import Field
+
 from domo_sdk.models.base import DomoModel
 
 
@@ -27,4 +29,4 @@ class Role(DomoModel):
     description: str = ""
     is_system: bool = False
     user_count: int = 0
-    authorities: list[Authority] = []
+    authorities: list[Authority] = Field(default_factory=list)

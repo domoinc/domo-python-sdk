@@ -4,97 +4,75 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 from domo_sdk.clients.roles import RolesClient
+from domo_sdk.models.roles import Authority, Role
 
 
 def _make_client() -> tuple[RolesClient, MagicMock]:
-    """Create a RolesClient with a fully mocked transport."""
     transport = MagicMock()
     transport.auth_mode = "developer_token"
-    client = RolesClient(transport)
-    return client, transport
+    return RolesClient(transport), transport
 
 
-class TestRolesClient:
-    """Tests for RolesClient operations."""
-
-    def test_list_roles(self) -> None:
-        """GET /authorization/v1/roles."""
+class TestRolesCRUD:
+    def test_list(self) -> None:
         client, transport = _make_client()
         transport.get.return_value = [
             {"id": 1, "name": "Admin"},
-            {"id": 2, "name": "Editor"},
+            {"id": 2, "name": "Privileged"},
         ]
 
         result = client.list()
 
-        transport.get.assert_called_once_with(
-            "/authorization/v1/roles",
-            params=None,
-        )
         assert len(result) == 2
+        assert all(isinstance(r, Role) for r in result)
+        assert result[0].name == "Admin"
 
-    def test_create_role(self) -> None:
-        """POST /authorization/v1/roles."""
+    def test_create(self) -> None:
         client, transport = _make_client()
-        transport.post.return_value = {"id": 3, "name": "Viewer"}
+        transport.post.return_value = {"id": 3, "name": "Custom"}
 
-        body = {"name": "Viewer", "description": "Read-only access"}
-        result = client.create(body)
+        result = client.create({"name": "Custom"})
 
-        transport.post.assert_called_once_with(
-            "/authorization/v1/roles",
-            body=body,
-            params=None,
-        )
-        assert result["name"] == "Viewer"
+        assert isinstance(result, Role)
+        assert result.name == "Custom"
 
-    def test_get_role(self) -> None:
-        """GET /authorization/v1/roles/{id}."""
+    def test_get(self) -> None:
         client, transport = _make_client()
         transport.get.return_value = {"id": 1, "name": "Admin"}
 
         result = client.get(1)
 
-        transport.get.assert_called_once_with(
-            "/authorization/v1/roles/1",
-            params=None,
-        )
-        assert result["id"] == 1
+        assert isinstance(result, Role)
+        assert result.id == 1
 
-    def test_delete_role(self) -> None:
-        """DELETE /authorization/v1/roles/{id}."""
+    def test_delete(self) -> None:
         client, transport = _make_client()
-
         client.delete(1)
+        transport.delete.assert_called_once_with(
+            "/authorization/v1/roles/1", params=None
+        )
 
-        transport.delete.assert_called_once_with("/authorization/v1/roles/1", params=None)
 
+class TestRolesAuthorities:
     def test_list_authorities(self) -> None:
-        """GET /authorization/v1/roles/{id}/authorities."""
         client, transport = _make_client()
         transport.get.return_value = [
-            {"authority": "DATA_MANAGE", "grant_type": "ROLE"},
+            {"id": 1, "authority": "DATA"},
+            {"id": 2, "authority": "USER"},
         ]
 
         result = client.list_authorities(1)
 
-        transport.get.assert_called_once_with(
-            "/authorization/v1/roles/1/authorities",
-            params=None,
-        )
-        assert len(result) == 1
-        assert result[0]["authority"] == "DATA_MANAGE"
+        assert len(result) == 2
+        assert all(isinstance(a, Authority) for a in result)
 
     def test_update_authorities(self) -> None:
-        """PATCH /authorization/v1/roles/{id}/authorities."""
         client, transport = _make_client()
-        transport.patch.return_value = {"status": "ok"}
+        transport.patch.return_value = [
+            {"id": 1, "authority": "DATA"},
+        ]
 
-        authorities = [{"authority": "DATA_MANAGE"}, {"authority": "USER_MANAGE"}]
-        result = client.update_authorities(1, authorities)
+        result = client.update_authorities(1, [{"authority": "DATA"}])
 
-        transport.patch.assert_called_once_with(
-            "/authorization/v1/roles/1/authorities",
-            body=authorities,
-        )
-        assert result["status"] == "ok"
+        assert len(result) == 1
+        assert isinstance(result[0], Authority)

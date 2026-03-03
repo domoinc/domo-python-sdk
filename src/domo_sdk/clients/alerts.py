@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.clients.base import DomoAPIClient
+from domo_sdk.models.alerts import Alert
 
 URL_BASE = "/social/v4/alerts"
 
@@ -15,14 +16,16 @@ class AlertsClient(DomoAPIClient):
     Docs: https://developer.domo.com/docs/alerts-api-reference/alerts
     """
 
-    def query(self, limit: int = 50, offset: int = 0) -> list:
+    def query(self, limit: int = 50, offset: int = 0) -> list[Alert]:
         """Query alerts."""
         params: dict[str, Any] = {"limit": limit, "offset": offset}
-        return self._list(URL_BASE, params=params)
+        data = self._list(URL_BASE, params=params)
+        return [Alert.model_validate(a) for a in data]
 
-    def get(self, alert_id: int) -> dict:
+    def get(self, alert_id: int) -> Alert:
         """Retrieve a single alert by ID."""
-        return self._get(f"{URL_BASE}/{alert_id}")
+        data = self._get(f"{URL_BASE}/{alert_id}")
+        return Alert.model_validate(data)
 
     def subscribe(self, alert_id: int) -> None:
         """Subscribe to an alert."""

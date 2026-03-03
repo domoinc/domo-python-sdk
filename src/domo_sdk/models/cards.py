@@ -29,7 +29,7 @@ class DrillPath(DomoModel):
 
     id: int | None = None
     name: str = ""
-    fields: list[DrillPathField] = []
+    fields: list[DrillPathField] = Field(default_factory=list)
 
 
 class Card(DomoModel):
@@ -39,8 +39,10 @@ class Card(DomoModel):
     name: str = Field(default="", alias="title")
     description: str = ""
     type: str = ""
-    owners: list[dict[str, Any]] = []
+    owners: list[dict[str, Any]] = Field(default_factory=list)
     created_at: datetime | None = Field(default=None, alias="createdAt")
     updated_at: datetime | None = Field(default=None, alias="updatedAt")
     dataset_id: str = Field(default="", alias="dataSetId")
-    drill_paths: list[DrillPath] = Field(default=[], alias="drillPaths")
+    drill_paths: list[DrillPath] = Field(
+        default_factory=list, alias="drillPaths"
+    )

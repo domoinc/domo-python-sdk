@@ -38,5 +38,5 @@ class Alert(DomoModel):
     created_at: datetime | None = Field(default=None, alias="createdAt")
     updated_at: datetime | None = Field(default=None, alias="updatedAt")
     triggered: bool = False
-    rules: list[AlertRule] = []
-    subscribers: list[AlertSubscription] = []
+    rules: list[AlertRule] = Field(default_factory=list)
+    subscribers: list[AlertSubscription] = Field(default_factory=list)

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.async_clients.base import AsyncDomoAPIClient
+from domo_sdk.models.alerts import Alert
 
 URL_BASE = "/v1/alerts"
 
@@ -19,14 +20,16 @@ class AsyncAlertsClient(AsyncDomoAPIClient):
         self,
         per_page: int = 50,
         offset: int = 0,
-    ) -> list[dict]:
+    ) -> list[Alert]:
         """List alerts."""
         params: dict[str, Any] = {"limit": per_page, "offset": offset}
-        return await self._list(URL_BASE, params=params)
+        data = await self._list(URL_BASE, params=params)
+        return [Alert.model_validate(a) for a in data]
 
-    async def get(self, alert_id: int) -> dict:
+    async def get(self, alert_id: int) -> Alert:
         """Retrieve a single alert by ID."""
-        return await self._get(f"{URL_BASE}/{alert_id}")
+        data = await self._get(f"{URL_BASE}/{alert_id}")
+        return Alert.model_validate(data)
 
     async def subscribe(self, alert_id: int, user_id: int) -> None:
         """Subscribe a user to an alert."""
