@@ -61,7 +61,7 @@ class DataSourceSchema(DomoModel):
     dataset_id: str = Field(alias="datasetId")
     name: str = ""
     description: str = ""
-    columns: list[DataSourceColumn] = []
+    columns: list[DataSourceColumn] = Field(default_factory=list)
 
 
 class ReasoningConfig(DomoModel):
@@ -103,7 +103,7 @@ class ToolUseContent(DomoModel):
     type: Literal["tool_use"] = "tool_use"
     id: str = ""
     name: str = ""
-    input: dict[str, Any] = {}
+    input: dict[str, Any] = Field(default_factory=dict)
 
 
 class ToolResultContent(DomoModel):
@@ -153,8 +153,8 @@ class ToolInputSchema(DomoModel):
     """JSON schema for tool input."""
 
     type: str = "object"
-    properties: dict[str, Any] = {}
-    required: list[str] = []
+    properties: dict[str, Any] = Field(default_factory=dict)
+    required: list[str] = Field(default_factory=list)
 
 
 class ToolDefinition(DomoModel):
@@ -183,8 +183,8 @@ class TextSqlRequest(DomoModel):
     """Request for natural language to SQL."""
 
     input: str
-    datasource_schemas: list[DataSourceSchema] = Field(default=[], alias="datasourceSchemas")
-    options: list[SqlRequestOption] = []
+    datasource_schemas: list[DataSourceSchema] = Field(default_factory=list, alias="datasourceSchemas")
+    options: list[SqlRequestOption] = Field(default_factory=list)
     max_tokens: int = Field(default=1024, alias="maxTokens")
 
 
@@ -313,7 +313,7 @@ class MessagesAIResponse(DomoModel):
     """Response from chat and tool-calling endpoints."""
 
     id: str = ""
-    content: list[dict[str, Any]] = []
+    content: list[dict[str, Any]] = Field(default_factory=list)
     model: str = ""
     role: str = "assistant"
     stop_reason: StopReason | None = Field(default=None, alias="stopReason")
@@ -339,7 +339,7 @@ class TargetedSentimentResult(DomoModel):
 class TargetedSentimentAIResponse(DomoModel):
     """Response from targeted sentiment analysis."""
 
-    results: list[TargetedSentimentResult] = []
+    results: list[TargetedSentimentResult] = Field(default_factory=list)
     usage: ModelProviderUsage | None = None
 
 
@@ -353,20 +353,20 @@ class ClassificationResult(DomoModel):
 class ClassificationAIResponse(DomoModel):
     """Response from classification."""
 
-    classifications: list[ClassificationResult] = []
+    classifications: list[ClassificationResult] = Field(default_factory=list)
     usage: ModelProviderUsage | None = None
 
 
 class ExtractionAIResponse(DomoModel):
     """Response from extraction."""
 
-    output: dict[str, Any] = {}
+    output: dict[str, Any] = Field(default_factory=dict)
     usage: ModelProviderUsage | None = None
 
 
 class EmbeddingAIResponse(DomoModel):
     """Response from embedding endpoints."""
 
-    embeddings: list[list[float]] = []
+    embeddings: list[list[float]] = Field(default_factory=list)
     model: str = ""
     usage: ModelProviderUsage | None = None

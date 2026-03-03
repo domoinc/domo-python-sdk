@@ -31,8 +31,8 @@ class SearchQuery(DomoModel):
     query: str = "*"
     count: int = 50
     offset: int = 0
-    entities: list[SearchEntity] = []
-    filters: list[dict[str, Any]] = []
+    entities: list[SearchEntity] = Field(default_factory=list)
+    filters: list[dict[str, Any]] = Field(default_factory=list)
     combine_results: bool = Field(default=True, alias="combineResults")
     sort: dict[str, Any] | None = None
 
@@ -50,7 +50,7 @@ class SearchResult(DomoModel):
 class SearchResponse(DomoModel):
     """Search response containing results."""
 
-    data_sources: list[SearchResult] = Field(default=[], alias="dataSources")
-    users: list[SearchResult] = []
-    cards: list[SearchResult] = []
+    data_sources: list[SearchResult] = Field(default_factory=list, alias="dataSources")
+    users: list[SearchResult] = Field(default_factory=list)
+    cards: list[SearchResult] = Field(default_factory=list)
     total_count: int = Field(default=0, alias="totalCount")
