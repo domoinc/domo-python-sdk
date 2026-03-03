@@ -30,7 +30,7 @@ class Column(DomoModel):
 class Schema(DomoModel):
     """Dataset schema."""
 
-    columns: list[Column]
+    columns: list[Column] = Field(default_factory=list)
 
 
 class UpdateMethod(str, Enum):
@@ -62,7 +62,7 @@ class PolicyFilter(DomoModel):
     """PDP policy filter."""
 
     column: str
-    values: list[str]
+    values: list[str] = Field(default_factory=list)
     operator: FilterOperator
     not_: bool = Field(default=False, alias="not")
 
@@ -78,10 +78,10 @@ class Policy(DomoModel):
     id: int | None = None
     type: PolicyType = PolicyType.USER
     name: str
-    filters: list[PolicyFilter] = []
-    users: list[int] = []
-    virtual_users: list[int] = Field(default=[], alias="virtualUsers")
-    groups: list[int] = []
+    filters: list[PolicyFilter] = Field(default_factory=list)
+    users: list[int] = Field(default_factory=list)
+    virtual_users: list[int] = Field(default_factory=list, alias="virtualUsers")
+    groups: list[int] = Field(default_factory=list)
 
 
 class DataSetRequest(DomoModel):
@@ -96,8 +96,8 @@ class DataSetRequest(DomoModel):
 class DataSet(DomoModel):
     """Dataset response from API."""
 
-    id: str
-    name: str
+    id: str = ""
+    name: str = ""
     description: str = ""
     rows: int = 0
     columns: int = 0
@@ -105,15 +105,17 @@ class DataSet(DomoModel):
     owner: dict[str, Any] | None = None
     created_at: datetime | None = Field(default=None, alias="createdAt")
     updated_at: datetime | None = Field(default=None, alias="updatedAt")
-    data_current_at: datetime | None = Field(default=None, alias="dataCurrentAt")
+    data_current_at: datetime | None = Field(
+        default=None, alias="dataCurrentAt"
+    )
     pdp_enabled: bool = Field(default=False, alias="pdpEnabled")
 
 
 class QueryResult(DomoModel):
     """SQL query result."""
 
-    columns: list[str] = []
-    rows: list[list[Any]] = []
+    columns: list[str] = Field(default_factory=list)
+    rows: list[list[Any]] = Field(default_factory=list)
     num_rows: int = Field(default=0, alias="numRows")
     num_columns: int = Field(default=0, alias="numColumns")
 
@@ -123,13 +125,13 @@ class DataSetPermission(DomoModel):
 
     id: int
     type: str  # "USER" or "GROUP"
-    permissions: list[str] = []  # e.g., ["READ", "WRITE", "SHARE"]
+    permissions: list[str] = Field(default_factory=list)
 
 
 class DataVersion(DomoModel):
     """Dataset data version."""
 
-    version_id: str = Field(alias="versionId")
+    version_id: str = Field(default="", alias="versionId")
     created_at: datetime | None = Field(default=None, alias="createdAt")
     row_count: int = Field(default=0, alias="rowCount")
 
@@ -137,11 +139,25 @@ class DataVersion(DomoModel):
 class Partition(DomoModel):
     """Dataset partition info."""
 
-    partition_id: str = Field(alias="partitionId")
+    partition_id: str = Field(default="", alias="partitionId")
     name: str = ""
 
 
 class Index(DomoModel):
     """Dataset index."""
 
-    columns: list[str] = []
+    columns: list[str] = Field(default_factory=list)
+
+
+class UploadSession(DomoModel):
+    """Dataset upload session."""
+
+    upload_id: int = Field(default=0, alias="uploadId")
+
+
+class SharePermission(DomoModel):
+    """Permission entry for sharing a dataset."""
+
+    id: int
+    type: str  # "USER" or "GROUP"
+    access_level: str = Field(default="READ", alias="accessLevel")

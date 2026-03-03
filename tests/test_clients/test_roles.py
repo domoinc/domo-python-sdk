@@ -67,7 +67,7 @@ class TestRolesClient:
 
         client.delete(1)
 
-        transport.delete.assert_called_once_with("/authorization/v1/roles/1")
+        transport.delete.assert_called_once_with("/authorization/v1/roles/1", params=None)
 
     def test_list_authorities(self) -> None:
         """GET /authorization/v1/roles/{id}/authorities."""
