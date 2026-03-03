@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.clients.base import DomoAPIClient
+from domo_sdk.models.groups import Group
 
 URL_BASE = "/v1/groups"
 
@@ -15,22 +16,28 @@ class GroupClient(DomoAPIClient):
     Docs: https://developer.domo.com/docs/groups-api-reference/groups-2
     """
 
-    def create(self, group_request: dict) -> dict:
+    def create(self, group_request: dict) -> Group:
         """Create a new group."""
-        return self._create(URL_BASE, group_request)
+        data = self._create(URL_BASE, group_request)
+        return Group.model_validate(data)
 
-    def get(self, group_id: int) -> dict:
+    def get(self, group_id: int) -> Group:
         """Retrieve a single group by ID."""
-        return self._get(f"{URL_BASE}/{group_id}")
+        data = self._get(f"{URL_BASE}/{group_id}")
+        return Group.model_validate(data)
 
-    def list(self, per_page: int = 50, offset: int = 0) -> list:
+    def list(
+        self, per_page: int = 50, offset: int = 0
+    ) -> list[Group]:
         """List groups."""
         params: dict[str, Any] = {"limit": per_page, "offset": offset}
-        return self._list(URL_BASE, params=params)
+        data = self._list(URL_BASE, params=params)
+        return [Group.model_validate(g) for g in data]
 
-    def update(self, group_id: int, group_update: dict) -> dict:
+    def update(self, group_id: int, group_update: dict) -> Group:
         """Update an existing group."""
-        return self._update(f"{URL_BASE}/{group_id}", group_update)
+        data = self._update(f"{URL_BASE}/{group_id}", group_update)
+        return Group.model_validate(data)
 
     def delete(self, group_id: int) -> None:
         """Delete a group."""
@@ -44,7 +51,9 @@ class GroupClient(DomoAPIClient):
         """Remove a user from a group."""
         self._delete(f"{URL_BASE}/{group_id}/users/{user_id}")
 
-    def list_users(self, group_id: int, limit: int = 50, offset: int = 0) -> list:
-        """List users in a group."""
+    def list_users(
+        self, group_id: int, limit: int = 50, offset: int = 0
+    ) -> list[int]:
+        """List user IDs in a group."""
         params: dict[str, Any] = {"limit": limit, "offset": offset}
         return self._list(f"{URL_BASE}/{group_id}/users", params=params)

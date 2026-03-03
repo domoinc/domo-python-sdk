@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from domo_sdk.async_clients.base import AsyncDomoAPIClient
+from domo_sdk.models.pages import Page, PageCollection
 
 URL_BASE = "/v1/pages"
 
@@ -15,22 +16,26 @@ class AsyncPageClient(AsyncDomoAPIClient):
     Docs: https://developer.domo.com/docs/page-api-reference/page
     """
 
-    async def create(self, name: str, **kwargs: Any) -> dict:
+    async def create(self, name: str, **kwargs: Any) -> Page:
         """Create a new page."""
         body: dict[str, Any] = {"name": name, **kwargs}
-        return await self._create(URL_BASE, body)
+        data = await self._create(URL_BASE, body)
+        return Page.model_validate(data)
 
-    async def get(self, page_id: int) -> dict:
+    async def get(self, page_id: int) -> Page:
         """Retrieve a single page by ID."""
-        return await self._get(f"{URL_BASE}/{page_id}")
+        data = await self._get(f"{URL_BASE}/{page_id}")
+        return Page.model_validate(data)
 
-    async def list(self) -> list:
+    async def list(self) -> list[Page]:
         """List all pages."""
-        return await self._list(URL_BASE)
+        data = await self._list(URL_BASE)
+        return [Page.model_validate(p) for p in data]
 
-    async def update(self, page_id: int, **kwargs: Any) -> dict:
+    async def update(self, page_id: int, **kwargs: Any) -> Page:
         """Update an existing page."""
-        return await self._update(f"{URL_BASE}/{page_id}", kwargs)
+        data = await self._update(f"{URL_BASE}/{page_id}", kwargs)
+        return Page.model_validate(data)
 
     async def delete(self, page_id: int) -> None:
         """Delete a page."""
@@ -40,25 +45,34 @@ class AsyncPageClient(AsyncDomoAPIClient):
     # Collections
     # ------------------------------------------------------------------
 
-    async def get_collections(self, page_id: int) -> list:
+    async def get_collections(
+        self, page_id: int
+    ) -> list[PageCollection]:
         """List collections on a page."""
         url = f"{URL_BASE}/{page_id}/collections"
-        return await self._list(url)
+        data = await self._list(url)
+        return [PageCollection.model_validate(c) for c in data]
 
-    async def create_collection(self, page_id: int, title: str, **kwargs: Any) -> dict:
+    async def create_collection(
+        self, page_id: int, title: str, **kwargs: Any
+    ) -> PageCollection:
         """Create a new collection on a page."""
         url = f"{URL_BASE}/{page_id}/collections"
         body: dict[str, Any] = {"title": title, **kwargs}
-        return await self._create(url, body)
+        data = await self._create(url, body)
+        return PageCollection.model_validate(data)
 
     async def update_collection(
         self, page_id: int, collection_id: int, **kwargs: Any
-    ) -> dict:
+    ) -> PageCollection:
         """Update a collection on a page."""
         url = f"{URL_BASE}/{page_id}/collections/{collection_id}"
-        return await self._update(url, kwargs)
+        data = await self._update(url, kwargs)
+        return PageCollection.model_validate(data)
 
-    async def delete_collection(self, page_id: int, collection_id: int) -> None:
+    async def delete_collection(
+        self, page_id: int, collection_id: int
+    ) -> None:
         """Delete a collection from a page."""
         url = f"{URL_BASE}/{page_id}/collections/{collection_id}"
         await self._delete(url)
