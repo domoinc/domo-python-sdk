@@ -137,13 +137,13 @@ class AsyncTransport:
         except httpx.ConnectError as err:
             raise DomoConnectionError(url=url) from err
 
-    async def put(self, url: str, body: Any = None) -> Any:
+    async def put(self, url: str, body: Any = None, params: dict[str, Any] | None = None) -> Any:
         headers = await self._get_headers(content_type="application/json")
         full_url = self._build_url(url)
         client = await self._get_client()
         start = time.time()
         try:
-            response = await client.put(full_url, headers=headers, json=body)
+            response = await client.put(full_url, headers=headers, params=params or {}, json=body)
             self._log_timing("PUT", url, time.time() - start)
             self._handle_response(response, url)
             if response.status_code == 204 or not response.content:
@@ -171,15 +171,18 @@ class AsyncTransport:
         except httpx.ConnectError as err:
             raise DomoConnectionError(url=url) from err
 
-    async def delete(self, url: str) -> None:
+    async def delete(self, url: str, params: dict[str, Any] | None = None) -> Any:
         headers = await self._get_headers()
         full_url = self._build_url(url)
         client = await self._get_client()
         start = time.time()
         try:
-            response = await client.delete(full_url, headers=headers)
+            response = await client.delete(full_url, headers=headers, params=params or {})
             self._log_timing("DELETE", url, time.time() - start)
             self._handle_response(response, url)
+            if response.status_code == 204 or not response.content:
+                return None
+            return response.json()
         except httpx.TimeoutException as err:
             raise DomoTimeoutError(url=url, timeout=self._timeout.read or DEFAULT_TIMEOUT) from err
         except httpx.ConnectError as err:

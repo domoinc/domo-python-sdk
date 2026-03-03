@@ -29,13 +29,13 @@ class DomoAPIClient:
     def _list(self, url: str, params: dict[str, Any] | None = None) -> Any:
         return self.transport.get(url, params=params)
 
-    def _update(self, url: str, body: Any, method: str = "PUT") -> Any:
+    def _update(self, url: str, body: Any, method: str = "PUT", params: dict[str, Any] | None = None) -> Any:
         if method == "PATCH":
             return self.transport.patch(url, body=body)
-        return self.transport.put(url, body=body)
+        return self.transport.put(url, body=body, params=params)
 
-    def _delete(self, url: str) -> None:
-        self.transport.delete(url)
+    def _delete(self, url: str, params: dict[str, Any] | None = None) -> Any:
+        return self.transport.delete(url, params=params)
 
     def _upload_csv(self, url: str, csv_data: bytes | str) -> Any:
         return self.transport.put_csv(url, body=csv_data)

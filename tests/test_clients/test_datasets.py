@@ -72,7 +72,7 @@ class TestDataSetClientCRUD:
 
         client.delete("ds-123")
 
-        transport.delete.assert_called_once_with("/v1/datasets/ds-123")
+        transport.delete.assert_called_once_with("/v1/datasets/ds-123", params=None)
 
 
 class TestDataSetClientQuery:

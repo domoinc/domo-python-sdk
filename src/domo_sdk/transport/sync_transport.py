@@ -115,13 +115,15 @@ class SyncTransport:
         except requests.ConnectionError as err:
             raise DomoConnectionError(url=url) from err
 
-    def put(self, url: str, body: Any = None) -> Any:
+    def put(self, url: str, body: Any = None, params: dict[str, Any] | None = None) -> Any:
         headers = self._get_headers(content_type="application/json")
         full_url = self._build_url(url)
         data = json.dumps(body, default=str) if body is not None else None
         start = time.time()
         try:
-            response = self._session.put(full_url, headers=headers, data=data, timeout=self._timeout)
+            response = self._session.put(
+                full_url, headers=headers, params=params or {}, data=data, timeout=self._timeout,
+            )
             self._log_timing("PUT", url, time.time() - start)
             self._handle_response(response, url)
             if response.status_code == 204 or not response.content:
@@ -149,14 +151,17 @@ class SyncTransport:
         except requests.ConnectionError as err:
             raise DomoConnectionError(url=url) from err
 
-    def delete(self, url: str) -> None:
+    def delete(self, url: str, params: dict[str, Any] | None = None) -> Any:
         headers = self._get_headers()
         full_url = self._build_url(url)
         start = time.time()
         try:
-            response = self._session.delete(full_url, headers=headers, timeout=self._timeout)
+            response = self._session.delete(full_url, headers=headers, params=params or {}, timeout=self._timeout)
             self._log_timing("DELETE", url, time.time() - start)
             self._handle_response(response, url)
+            if response.status_code == 204 or not response.content:
+                return None
+            return response.json()
         except requests.Timeout as err:
             raise DomoTimeoutError(url=url, timeout=self._timeout) from err
         except requests.ConnectionError as err:
