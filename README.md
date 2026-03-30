@@ -31,6 +31,15 @@ Current Release: 0.3.0
 - Page Management
     - Create, update, and delete pages
     - Docs: https://developer.domo.com/docs/page-api-reference/page
+- Account Management
+    - Create, get, list, update, and delete accounts
+    - Supports paginated listing of accounts
+- Streams Management
+    - Create, get, list, update, search, and delete Streams
+    - Use Streams for massive, constantly changing, or rapidly growing data sources
+    - Supports uploading data in parts (CSV or GZIP), in parallel
+    - Manage Stream Executions: create, get, list, commit, and abort
+    - Docs: https://developer.domo.com/docs/data-apis/data
 
 ### Setup
 * Install Python3: https://www.python.org/downloads/
