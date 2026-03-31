@@ -31,6 +31,15 @@ Current Release: 0.3.0
 - Page Management
     - Create, update, and delete pages
     - Docs: https://developer.domo.com/docs/page-api-reference/page
+- Account Management
+    - Create, get, list, update, and delete accounts
+    - Supports paginated listing of accounts
+- Streams Management
+    - Create, get, list, update, search, and delete Streams
+    - Use Streams for massive, constantly changing, or rapidly growing data sources
+    - Supports uploading data in parts (CSV or GZIP), in parallel
+    - Manage Stream Executions: create, get, list, commit, and abort
+    - Docs: https://developer.domo.com/docs/data-apis/data
 
 ### Setup
 * Install Python3: https://www.python.org/downloads/
@@ -135,3 +144,23 @@ The functions in this package match most parts of the API documented at [develop
 	* **users_list** - list all users
 	* **users_get** - get a single user record
 	* **users_add** - create a user (or users)
+* **Accounts** - functions to manage Domo accounts (credentials/connections)
+	* **accounts_create** - create a new account
+	* **accounts_get** - get a single account by ID
+	* **accounts_list** - list all accounts
+	* **accounts_update** - update an existing account
+	* **accounts_delete** - delete an account
+* **Streams** - functions to manage Domo Streams (high-volume upload pipelines)
+	* **streams.create** - create a new Stream and associated DataSet
+	* **streams.get** - get a Stream by ID
+	* **streams.list** - list Streams
+	* **streams.update** - update a Stream
+	* **streams.search** - search for Streams by property
+	* **streams.delete** - delete a Stream
+	* **streams.create_execution** - create a new Execution on a Stream
+	* **streams.get_execution** - get an Execution by ID
+	* **streams.list_executions** - list Executions for a Stream
+	* **streams.upload_part** - upload a data part to an Execution
+	* **streams.commit_execution** - commit an Execution to finalize the upload
+	* **streams.abort_execution** - abort an Execution
+	* **streams.abort_current_execution** - abort the currently active Execution
