@@ -186,13 +186,13 @@ class Domo:
         """
             Evaluate query and return dataset in a dataframe
 
-            >>> query = {"sql": "SELECT * FROM table LIMIT 2"}
+            >>> query = "SELECT * FROM table LIMIT 2"
             >>> ds = domo.ds_query('80268aef-e6a1-44f6-a84c-f849d9db05fb', query)
             >>> print(ds.head())
 
             :Parameters:
             - `dataset_id`:     id of a dataset (str)
-            - `query`:          query object (dict)
+            - `query`:          query (str)
             - `return_data`:    should the result be a dataframe. Default True (Boolean)
 
             :Returns:
